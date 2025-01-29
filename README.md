@@ -33,6 +33,26 @@
             padding: 20px;
             text-align: center;
         }
+        .game-container {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            margin-top: 20px;
+        }
+        .game-card {
+            border: 2px solid #ccc;
+            border-radius: 10px;
+            overflow: hidden;
+            text-align: center;
+        }
+        .game-card img {
+            width: 100%;
+            height: auto;
+        }
+        .game-card iframe {
+            width: 100%;
+            height: 400px;
+        }
     </style>
 </head>
 <body>
@@ -56,17 +76,61 @@
     <!-- Games Section -->
     <section id="games">
         <h2>Popular Games</h2>
-        <ul>
-            <li><a href="https://poki.com/en/g/subway-surfers" target="_blank">Play Subway Surfers</a></li>
-            <li><a href="https://retrobowl.io" target="_blank">Play Retro Bowl</a></li>
-            <li><a href="https://basketballrandom.io" target="_blank">Play Basketball Random</a></li>
-            <li><a href="https://flappybird.io" target="_blank">Play Flappy Bird</a></li>
-            <li><a href="https://bitlife.com" target="_blank">Play BitLife (College Version)</a></li>
-            <li><a href="https://soccer-random.com" target="_blank">Play Soccer Random</a></li>
-            <li><a href="https://cookieclicker.io" target="_blank">Play Cookie Clicker</a></li>
-            <li><a href="https://1v1lol.io" target="_blank">Play 1v1.lol (Old Version)</a></li>
-            <li><a href="https://fridaynightfunkin.io" target="_blank">Play Friday Night Funkin'</a></li>
-        </ul>
+        <div class="game-container">
+            <!-- Subway Surfers -->
+            <div class="game-card">
+                <img src="subway-surfers-image.jpg" alt="Subway Surfers">
+                <iframe src="https://example.com/subway-surfers-embed" frameborder="0"></iframe>
+            </div>
+
+            <!-- Retro Bowl -->
+            <div class="game-card">
+                <img src="retro-bowl-image.jpg" alt="Retro Bowl">
+                <iframe src="https://example.com/retro-bowl-embed" frameborder="0"></iframe>
+            </div>
+
+            <!-- Basketball Random -->
+            <div class="game-card">
+                <img src="basketball-random-image.jpg" alt="Basketball Random">
+                <iframe src="https://example.com/basketball-random-embed" frameborder="0"></iframe>
+            </div>
+
+            <!-- Flappy Bird -->
+            <div class="game-card">
+                <img src="flappy-bird-image.jpg" alt="Flappy Bird">
+                <iframe src="https://example.com/flappy-bird-embed" frameborder="0"></iframe>
+            </div>
+
+            <!-- BitLife (College) -->
+            <div class="game-card">
+                <img src="bitlife-college-image.jpg" alt="BitLife College">
+                <iframe src="https://example.com/bitlife-college-embed" frameborder="0"></iframe>
+            </div>
+
+            <!-- Soccer Random -->
+            <div class="game-card">
+                <img src="soccer-random-image.jpg" alt="Soccer Random">
+                <iframe src="https://example.com/soccer-random-embed" frameborder="0"></iframe>
+            </div>
+
+            <!-- Cookie Clicker -->
+            <div class="game-card">
+                <img src="cookie-clicker-image.jpg" alt="Cookie Clicker">
+                <iframe src="https://example.com/cookie-clicker-embed" frameborder="0"></iframe>
+            </div>
+
+            <!-- 1v1.lol -->
+            <div class="game-card">
+                <img src="1v1-lol-image.jpg" alt="1v1.lol">
+                <iframe src="https://example.com/1v1lol-embed" frameborder="0"></iframe>
+            </div>
+
+            <!-- Friday Night Funkin' -->
+            <div class="game-card">
+                <img src="friday-night-funkin-image.jpg" alt="Friday Night Funkin'">
+                <iframe src="https://example.com/friday-night-funkin-embed" frameborder="0"></iframe>
+            </div>
+        </div>
     </section>
 
     <!-- About Section -->
@@ -81,3 +145,4 @@
     </footer>
 </body>
 </html>
+
