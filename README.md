@@ -5,45 +5,46 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>My Game Website</title>
     <style>
+        /* Global styles */
         body {
             font-family: Arial, sans-serif;
             margin: 0;
             padding: 0;
+            background-color: #f4f4f4;
         }
-        nav {
+        header {
             background-color: #333;
+            color: white;
+            text-align: center;
             padding: 10px;
         }
-        nav ul {
-            list-style: none;
-            margin: 0;
-            padding: 0;
-            display: flex;
-            justify-content: center;
+        nav {
+            background-color: #444;
+            padding: 10px;
         }
-        nav ul li {
-            margin: 0 15px;
-        }
-        nav ul li a {
+        nav a {
             color: white;
+            padding: 10px;
             text-decoration: none;
-            font-size: 18px;
+            margin: 5px;
         }
-        section {
-            padding: 20px;
-            text-align: center;
+        nav a:hover {
+            background-color: #555;
         }
+
+        /* Game section */
         .game-container {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
+            display: flex;
+            flex-wrap: wrap;
             gap: 20px;
-            margin-top: 20px;
+            padding: 20px;
         }
         .game-card {
-            border: 2px solid #ccc;
-            border-radius: 10px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
             overflow: hidden;
-            text-align: center;
+            width: 300px;
         }
         .game-card img {
             width: 100%;
@@ -51,98 +52,51 @@
         }
         .game-card iframe {
             width: 100%;
-            height: 400px;
+            height: 200px;
+        }
+
+        /* Footer styles */
+        footer {
+            background-color: #333;
+            color: white;
+            text-align: center;
+            padding: 10px;
         }
     </style>
 </head>
 <body>
-    <!-- Navigation Bar -->
     <header>
-        <nav>
-            <ul>
-                <li><a href="#home">Home</a></li>
-                <li><a href="#games">Games</a></li>
-                <li><a href="#about">About</a></li>
-            </ul>
-        </nav>
+        <h1>Welcome to My Game Website</h1>
     </header>
 
-    <!-- Main Content Section -->
-    <section id="home">
-        <h1>Welcome to My Game Website</h1>
-        <p>Play your favorite online games here!</p>
-    </section>
+    <nav>
+        <a href="#subway-surfer">Subway Surfer</a>
+        <a href="#retro-bowl">Retro Bowl</a>
+        <a href="#basketball-random">Basketball Random</a>
+        <!-- Add more links here -->
+    </nav>
 
-    <!-- Games Section -->
-    <section id="games">
-        <h2>Popular Games</h2>
-        <div class="game-container">
-            <!-- Subway Surfers -->
-            <div class="game-card">
-                <img src="subway-surfers-image.jpg" alt="Subway Surfers">
-                <iframe src="https://example.com/subway-surfers-embed" frameborder="0"></iframe>
-            </div>
-
-            <!-- Retro Bowl -->
-            <div class="game-card">
-                <img src="retro-bowl-image.jpg" alt="Retro Bowl">
-                <iframe src="https://example.com/retro-bowl-embed" frameborder="0"></iframe>
-            </div>
-
-            <!-- Basketball Random -->
-            <div class="game-card">
-                <img src="basketball-random-image.jpg" alt="Basketball Random">
-                <iframe src="https://example.com/basketball-random-embed" frameborder="0"></iframe>
-            </div>
-
-            <!-- Flappy Bird -->
-            <div class="game-card">
-                <img src="flappy-bird-image.jpg" alt="Flappy Bird">
-                <iframe src="https://example.com/flappy-bird-embed" frameborder="0"></iframe>
-            </div>
-
-            <!-- BitLife (College) -->
-            <div class="game-card">
-                <img src="bitlife-college-image.jpg" alt="BitLife College">
-                <iframe src="https://example.com/bitlife-college-embed" frameborder="0"></iframe>
-            </div>
-
-            <!-- Soccer Random -->
-            <div class="game-card">
-                <img src="soccer-random-image.jpg" alt="Soccer Random">
-                <iframe src="https://example.com/soccer-random-embed" frameborder="0"></iframe>
-            </div>
-
-            <!-- Cookie Clicker -->
-            <div class="game-card">
-                <img src="cookie-clicker-image.jpg" alt="Cookie Clicker">
-                <iframe src="https://example.com/cookie-clicker-embed" frameborder="0"></iframe>
-            </div>
-
-            <!-- 1v1.lol -->
-            <div class="game-card">
-                <img src="1v1-lol-image.jpg" alt="1v1.lol">
-                <iframe src="https://example.com/1v1lol-embed" frameborder="0"></iframe>
-            </div>
-
-            <!-- Friday Night Funkin' -->
-            <div class="game-card">
-                <img src="friday-night-funkin-image.jpg" alt="Friday Night Funkin'">
-                <iframe src="https://example.com/friday-night-funkin-embed" frameborder="0"></iframe>
-            </div>
+    <section class="game-container">
+        <div class="game-card" id="subway-surfer">
+            <img src="subway-surfer-thumbnail.jpg" alt="Subway Surfer">
+            <iframe src="https://your-game-url.com/subway-surfer" frameborder="0"></iframe>
         </div>
+
+        <div class="game-card" id="retro-bowl">
+            <img src="retro-bowl-thumbnail.jpg" alt="Retro Bowl">
+            <iframe src="https://your-game-url.com/retro-bowl" frameborder="0"></iframe>
+        </div>
+
+        <div class="game-card" id="basketball-random">
+            <img src="basketball-random-thumbnail.jpg" alt="Basketball Random">
+            <iframe src="https://your-game-url.com/basketball-random" frameborder="0"></iframe>
+        </div>
+
+        <!-- Add more games here -->
     </section>
 
-    <!-- About Section -->
-    <section id="about">
-        <h2>About This Website</h2>
-        <p>This website was created to provide a variety of fun online games for everyone to enjoy!</p>
-    </section>
-
-    <!-- Footer -->
     <footer>
-        <p>&copy; 2025 My Game Website</p>
+        <p>&copy; 2025 My Game Website. All rights reserved.</p>
     </footer>
 </body>
 </html>
-
