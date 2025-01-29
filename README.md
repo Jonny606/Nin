@@ -33,13 +33,6 @@
             padding: 20px;
             text-align: center;
         }
-        iframe {
-            width: 800px;
-            height: 600px;
-            margin: 20px auto;
-            display: block;
-            border: none;
-        }
     </style>
 </head>
 <body>
@@ -63,42 +56,17 @@
     <!-- Games Section -->
     <section id="games">
         <h2>Popular Games</h2>
-
-        <!-- Subway Surfers Embed -->
-        <h3>Subway Surfers</h3>
-        <iframe src="https://example.com/subway-surfers"></iframe>
-
-        <!-- Retro Bowl Embed -->
-        <h3>Retro Bowl</h3>
-        <iframe src="https://example.com/retro-bowl"></iframe>
-
-        <!-- Basketball Random Embed -->
-        <h3>Basketball Random</h3>
-        <iframe src="https://example.com/basketball-random"></iframe>
-
-        <!-- Flappy Bird Embed -->
-        <h3>Flappy Bird</h3>
-        <iframe src="https://example.com/flappy-bird"></iframe>
-
-        <!-- BitLife (College Version) Embed -->
-        <h3>BitLife (College Version)</h3>
-        <iframe src="https://example.com/bitlife-college"></iframe>
-
-        <!-- Soccer Random Embed -->
-        <h3>Soccer Random</h3>
-        <iframe src="https://example.com/soccer-random"></iframe>
-
-        <!-- Cookie Clicker Embed -->
-        <h3>Cookie Clicker</h3>
-        <iframe src="https://example.com/cookie-clicker"></iframe>
-
-        <!-- 1v1.lol Old Version Embed -->
-        <h3>1v1.lol (Old Version)</h3>
-        <iframe src="https://example.com/1v1-lol-old"></iframe>
-
-        <!-- Friday Night Funkin' Embed -->
-        <h3>Friday Night Funkin'</h3>
-        <iframe src="https://example.com/friday-night-funkin"></iframe>
+        <ul>
+            <li><a href="https://poki.com/en/g/subway-surfers" target="_blank">Play Subway Surfers</a></li>
+            <li><a href="https://retrobowl.io" target="_blank">Play Retro Bowl</a></li>
+            <li><a href="https://basketballrandom.io" target="_blank">Play Basketball Random</a></li>
+            <li><a href="https://flappybird.io" target="_blank">Play Flappy Bird</a></li>
+            <li><a href="https://bitlife.com" target="_blank">Play BitLife (College Version)</a></li>
+            <li><a href="https://soccer-random.com" target="_blank">Play Soccer Random</a></li>
+            <li><a href="https://cookieclicker.io" target="_blank">Play Cookie Clicker</a></li>
+            <li><a href="https://1v1lol.io" target="_blank">Play 1v1.lol (Old Version)</a></li>
+            <li><a href="https://fridaynightfunkin.io" target="_blank">Play Friday Night Funkin'</a></li>
+        </ul>
     </section>
 
     <!-- About Section -->
