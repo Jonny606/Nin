@@ -41,11 +41,9 @@
     <h1>FIFA Pack Simulator</h1>
 
     <div id="packDisplay">
-        <button id="openPack" onclick="openPack()">Open Pack</button>
-        <button id="buyPack" onclick="buyPack()">Buy Pack</button>
+        <button id="openPack" onclick="openPack()">Open Pack (100 Coins)</button>
         <button id="viewClub" onclick="viewClub()">View Club</button>
         <button id="playAgainstBot" onclick="playAgainstBot()">Play Against Bot</button>
-        <button id="playAgainstRealPlayer" onclick="playAgainstRealPlayer()">Play Against Real Player</button>
     </div>
 
     <div id="packAnimation">
@@ -56,14 +54,14 @@
     </div>
 
     <div id="clubPlayers">
-        <!-- Players will be dynamically inserted here -->
+        <!-- Club players will be dynamically inserted here -->
     </div>
 
     <div id="coinDisplay">Coins: <span id="coins">1000</span></div>
 
     <script>
         let coins = 1000;  // Starting coins
-        let playersInClub = [];
+        let playersInClub = [];  // Club players array
 
         const imagesFolder = 'images/';
         const players = [
@@ -127,6 +125,11 @@
                         setTimeout(() => {
                             document.getElementById('teamImage').style.display = 'none';
                             document.getElementById('playerImage').style.display = 'block';
+                            // Hide animation after 5 seconds
+                            setTimeout(() => {
+                                document.getElementById('packAnimation').style.display = 'none';
+                                document.getElementById('packDisplay').style.display = 'flex';
+                            }, 5000);
                         }, 3000);
                     }, 3000);
                 }, 3000);
@@ -141,4 +144,4 @@
                 club.style.display = 'flex';
                 renderClubPlayers();
             } else {
-                club.style.display = '
+                club.style.display
