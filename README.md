@@ -41,9 +41,9 @@
     <h1>FIFA Pack Simulator</h1>
 
     <div id="packDisplay">
-        <button id="openPack" onclick="openPack()">Open Pack (100 Coins)</button>
-        <button id="viewClub" onclick="viewClub()">View Club</button>
-        <button id="playAgainstBot" onclick="playAgainstBot()">Play Against Bot</button>
+        <button id="openPack">Open Pack (100 Coins)</button>
+        <button id="viewClub">View Club</button>
+        <button id="playAgainstBot">Play Against Bot</button>
     </div>
 
     <div id="packAnimation">
@@ -97,7 +97,8 @@
             return shuffled.slice(0, num); // Get random players
         }
 
-        function openPack() {
+        // Handle opening pack
+        document.getElementById("openPack").addEventListener("click", function() {
             const packCost = 100; // Cost for opening a pack
             if (coins >= packCost) {
                 const playersInPack = getRandomPlayers(3); // Random 3 players from the list
@@ -136,12 +137,26 @@
             } else {
                 alert('Not enough coins to open the pack!');
             }
-        }
+        });
 
-        function viewClub() {
+        // Handle viewing club
+        document.getElementById("viewClub").addEventListener("click", function() {
             const club = document.getElementById('clubPlayers');
-            if (club.style.display === 'none') {
-                club.style.display = 'flex';
-                renderClubPlayers();
-            } else {
-                club.style.display
+            club.style.display = (club.style.display === 'none') ? 'flex' : 'none';
+            renderClubPlayers();
+        });
+
+        // Render club players
+        function renderClubPlayers() {
+            const club = document.getElementById('clubPlayers');
+            club.innerHTML = '';  // Clear existing players
+            playersInClub.forEach(player => {
+                const img = document.createElement('img');
+                img.src = imagesFolder + player.image;
+                img.alt = player.name;
+                club.appendChild(img);
+            });
+        }
+    </script>
+</body>
+</html>
