@@ -1,397 +1,793 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>FIFA Pack Simulator</title>
-  <style>
-    body {
-      background-color: #181818;
-      color: white;
-      font-family: sans-serif;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      min-height: 100vh;
-      flex-direction: column;
-    }
+import React, { useState, useEffect } from 'react';
+import { Package, Coins, Gem, CreditCard, Users, ShoppingCart, X, ArrowUp } from 'lucide-react';
 
-    .pack-container {
-      display: flex;
-      justify-content: center;
-      margin-bottom: 20px;
-    }
+// Types
+interface Player {
+  name: string;
+  rating: number;
+  country: string;
+  position: string;
+  team: string;
+  image: string;
+}
 
-    .pack {
-      width: 200px;
-      height: 100px;
-      background-color: #333;
-      border: 1px solid #ccc;
-      text-align: center;
-      padding: 20px;
-      cursor: pointer;
-      margin: 10px;
-      border-radius: 5px;
-      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-      position: relative;
-      overflow: hidden;
-      transform: scale(1);
-      transition: all 0.3s ease-in-out;
-      background-size: cover;
-      background-position: center;
-    }
+interface Pack {
+  type: 'low' | 'medium' | 'high';
+  cost: number;
+  credits: number;
+  label: string;
+}
 
-    .pack.opening {
-      transform: scale(1.1);
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    }
+// Players Data
+const players: Player[] = [
+  // Goalkeepers
+  {
+    name: "Alisson",
+    rating: 99,
+    country: "https://flagcdn.com/br.svg",
+    position: "GK",
+    team: "Liverpool",
+    image: "https://www.fifacm.com/content/media/imgs/fifa23/players/p231866.png"
+  },
+  {
+    name: "Thibaut Courtois",
+    rating: 91,
+    country: "https://flagcdn.com/be.svg",
+    position: "GK",
+    team: "Real Madrid",
+    image: "https://www.fifacm.com/content/media/imgs/fifa23/players/p192119.png"
+  },
+  {
+    name: "Marc-André ter Stegen",
+    rating: 89,
+    country: "https://flagcdn.com/de.svg",
+    position: "GK",
+    team: "Barcelona",
+    image: "https://www.fifacm.com/content/media/imgs/fifa23/players/p192448.png"
+  },
+  {
+    name: "Gianluigi Donnarumma",
+    rating: 87,
+    country: "https://flagcdn.com/it.svg",
+    position: "GK",
+    team: "PSG",
+    image: "https://www.fifacm.com/content/media/imgs/fifa23/players/p230621.png"
+  },
+  {
+    name: "Ederson",
+    rating: 88,
+    country: "https://flagcdn.com/br.svg",
+    position: "GK",
+    team: "Manchester City",
+    image: "https://www.fifacm.com/content/media/imgs/fifa23/players/p210257.png"
+  },
+  // Center Backs
+  {
+    name: "Virgil van Dijk",
+    rating: 99,
+    country: "https://flagcdn.com/nl.svg",
+    position: "CB",
+    team: "Liverpool",
+    image: "https://www.fifacm.com/content/media/imgs/fifa23/players/p203376.png"
+  },
+  {
+    name: "Rúben Dias",
+    rating: 89,
+    country: "https://flagcdn.com/pt.svg",
+    position: "CB",
+    team: "Manchester City",
+    image: "https://www.fifacm.com/content/media/imgs/fifa23/players/p239818.png"
+  },
+  {
+    name: "Antonio Rüdiger",
+    rating: 87,
+    country: "https://flagcdn.com/de.svg",
+    position: "CB",
+    team: "Real Madrid",
+    image: "https://www.fifacm.com/content/media/imgs/fifa23/players/p205452.png"
+  },
+  {
+    name: "Marquinhos",
+    rating: 88,
+    country: "https://flagcdn.com/br.svg",
+    position: "CB",
+    team: "PSG",
+    image: "https://www.fifacm.com/content/media/imgs/fifa23/players/p207865.png"
+  },
+  {
+    name: "William Saliba",
+    rating: 85,
+    country: "https://flagcdn.com/fr.svg",
+    position: "CB",
+    team: "Arsenal",
+    image: "https://www.fifacm.com/content/media/imgs/fifa23/players/p246669.png"
+  },
+  // Right Backs
+  {
+    name: "Trent Alexander-Arnold",
+    rating: 99,
+    country: "https://flagcdn.com/gb-eng.svg",
+    position: "RB",
+    team: "Liverpool",
+    image: "https://www.fifacm.com/content/media/imgs/fifa23/players/p231281.png"
+  },
+  {
+    name: "João Cancelo",
+    rating: 88,
+    country: "https://flagcdn.com/pt.svg",
+    position: "RB",
+    team: "Barcelona",
+    image: "https://www.fifacm.com/content/media/imgs/fifa23/players/p210514.png"
+  },
+  {
+    name: "Achraf Hakimi",
+    rating: 86,
+    country: "https://flagcdn.com/ma.svg",
+    position: "RB",
+    team: "PSG",
+    image: "https://www.fifacm.com/content/media/imgs/fifa23/players/p235212.png"
+  },
+  {
+    name: "Reece James",
+    rating: 85,
+    country: "https://flagcdn.com/gb-eng.svg",
+    position: "RB",
+    team: "Chelsea",
+    image: "https://www.fifacm.com/content/media/imgs/fifa23/players/p238074.png"
+  },
+  {
+    name: "Kyle Walker",
+    rating: 84,
+    country: "https://flagcdn.com/gb-eng.svg",
+    position: "RB",
+    team: "Manchester City",
+    image: "https://www.fifacm.com/content/media/imgs/fifa23/players/p188377.png"
+  },
+  // Left Backs
+  {
+    name: "Theo Hernández",
+    rating: 99,
+    country: "https://flagcdn.com/fr.svg",
+    position: "LB",
+    team: "AC Milan",
+    image: "https://www.fifacm.com/content/media/imgs/fifa23/players/p226221.png"
+  },
+  {
+    name: "Andy Robertson",
+    rating: 87,
+    country: "https://flagcdn.com/gb-sct.svg",
+    position: "LB",
+    team: "Liverpool",
+    image: "https://www.fifacm.com/content/media/imgs/fifa23/players/p216267.png"
+  },
+  {
+    name: "Alphonso Davies",
+    rating: 86,
+    country: "https://flagcdn.com/ca.svg",
+    position: "LB",
+    team: "Bayern Munich",
+    image: "https://www.fifacm.com/content/media/imgs/fifa23/players/p234396.png"
+  },
+  {
+    name: "Ferland Mendy",
+    rating: 84,
+    country: "https://flagcdn.com/fr.svg",
+    position: "LB",
+    team: "Real Madrid",
+    image: "https://www.fifacm.com/content/media/imgs/fifa23/players/p228618.png"
+  },
+  {
+    name: "Ben Chilwell",
+    rating: 83,
+    country: "https://flagcdn.com/gb-eng.svg",
+    position: "LB",
+    team: "Chelsea",
+    image: "https://www.fifacm.com/content/media/imgs/fifa23/players/p225659.png"
+  },
+  // CAMs
+  {
+    name: "Kevin De Bruyne",
+    rating: 99,
+    country: "https://flagcdn.com/be.svg",
+    position: "CAM",
+    team: "Manchester City",
+    image: "https://www.fifacm.com/content/media/imgs/fifa23/players/p192985.png"
+  },
+  {
+    name: "Bruno Fernandes",
+    rating: 88,
+    country: "https://flagcdn.com/pt.svg",
+    position: "CAM",
+    team: "Manchester United",
+    image: "https://www.fifacm.com/content/media/imgs/fifa23/players/p212198.png"
+  },
+  {
+    name: "Martin Ødegaard",
+    rating: 87,
+    country: "https://flagcdn.com/no.svg",
+    position: "CAM",
+    team: "Arsenal",
+    image: "https://www.fifacm.com/content/media/imgs/fifa23/players/p222665.png"
+  },
+  {
+    name: "Bernardo Silva",
+    rating: 86,
+    country: "https://flagcdn.com/pt.svg",
+    position: "CAM",
+    team: "Manchester City",
+    image: "https://www.fifacm.com/content/media/imgs/fifa23/players/p218667.png"
+  },
+  {
+    name: "Phil Foden",
+    rating: 85,
+    country: "https://flagcdn.com/gb-eng.svg",
+    position: "CAM",
+    team: "Manchester City",
+    image: "https://www.fifacm.com/content/media/imgs/fifa23/players/p237692.png"
+  },
+  // CDMs
+  {
+    name: "Rodri",
+    rating: 99,
+    country: "https://flagcdn.com/es.svg",
+    position: "CDM",
+    team: "Manchester City",
+    image: "https://www.fifacm.com/content/media/imgs/fifa23/players/p231866.png"
+  },
+  {
+    name: "Casemiro",
+    rating: 89,
+    country: "https://flagcdn.com/br.svg",
+    position: "CDM",
+    team: "Manchester United",
+    image: "https://www.fifacm.com/content/media/imgs/fifa23/players/p200145.png"
+  },
+  {
+    name: "Joshua Kimmich",
+    rating: 88,
+    country: "https://flagcdn.com/de.svg",
+    position: "CDM",
+    team: "Bayern Munich",
+    image: "https://www.fifacm.com/content/media/imgs/fifa23/players/p212622.png"
+  },
+  {
+    name: "Declan Rice",
+    rating: 86,
+    country: "https://flagcdn.com/gb-eng.svg",
+    position: "CDM",
+    team: "Arsenal",
+    image: "https://www.fifacm.com/content/media/imgs/fifa23/players/p234378.png"
+  },
+  {
+    name: "Aurélien Tchouaméni",
+    rating: 84,
+    country: "https://flagcdn.com/fr.svg",
+    position: "CDM",
+    team: "Real Madrid",
+    image: "https://www.fifacm.com/content/media/imgs/fifa23/players/p241637.png"
+  },
+  // Right Wingers
+  {
+    name: "Lionel Messi",
+    rating: 99,
+    country: "https://flagcdn.com/ar.svg",
+    position: "RW",
+    team: "Inter Miami",
+    image: "https://www.fifacm.com/content/media/imgs/fifa23/players/p158023.png"
+  },
+  {
+    name: "Mohamed Salah",
+    rating: 89,
+    country: "https://flagcdn.com/eg.svg",
+    position: "RW",
+    team: "Liverpool",
+    image: "https://www.fifacm.com/content/media/imgs/fifa23/players/p209331.png"
+  },
+  {
+    name: "Bukayo Saka",
+    rating: 86,
+    country: "https://flagcdn.com/gb-eng.svg",
+    position: "RW",
+    team: "Arsenal",
+    image: "https://www.fifacm.com/content/media/imgs/fifa23/players/p246669.png"
+  },
+  {
+    name: "Raphinha",
+    rating: 85,
+    country: "https://flagcdn.com/br.svg",
+    position: "RW",
+    team: "Barcelona",
+    image: "https://www.fifacm.com/content/media/imgs/fifa23/players/p231943.png"
+  },
+  {
+    name: "Rodrygo",
+    rating: 84,
+    country: "https://flagcdn.com/br.svg",
+    position: "RW",
+    team: "Real Madrid",
+    image: "https://www.fifacm.com/content/media/imgs/fifa23/players/p243812.png"
+  },
+  // Left Wingers
+  {
+    name: "Vinícius Júnior",
+    rating: 99,
+    country: "https://flagcdn.com/br.svg",
+    position: "LW",
+    team: "Real Madrid",
+    image: "https://www.fifacm.com/content/media/imgs/fifa23/players/p238794.png"
+  },
+  {
+    name: "Son Heung-min",
+    rating: 88,
+    country: "https://flagcdn.com/kr.svg",
+    position: "LW",
+    team: "Tottenham",
+    image: "https://www.fifacm.com/content/media/imgs/fifa23/players/p200104.png"
+  },
+  {
+    name: "Rafael Leão",
+    rating: 86,
+    country: "https://flagcdn.com/pt.svg",
+    position: "LW",
+    team: "AC Milan",
+    image: "https://www.fifacm.com/content/media/imgs/fifa23/players/p241721.png"
+  },
+  {
+    name: "Jack Grealish",
+    rating: 85,
+    country: "https://flagcdn.com/gb-eng.svg",
+    position: "LW",
+    team: "Manchester City",
+    image: "https://www.fifacm.com/content/media/imgs/fifa23/players/p213619.png"
+  },
+  {
+    name: "Cody Gakpo",
+    rating: 84,
+    country: "https://flagcdn.com/nl.svg",
+    position: "LW",
+    team: "Liverpool",
+    image: "https://www.fifacm.com/content/media/imgs/fifa23/players/p242516.png"
+  },
+  // Strikers
+  {
+    name: "Erling Haaland",
+    rating: 99,
+    country: "https://flagcdn.com/no.svg",
+    position: "ST",
+    team: "Manchester City",
+    image: "https://www.fifacm.com/content/media/imgs/fifa23/players/p239085.png"
+  },
+  {
+    name: "Harry Kane",
+    rating: 90,
+    country: "https://flagcdn.com/gb-eng.svg",
+    position: "ST",
+    team: "Bayern Munich",
+    image: "https://www.fifacm.com/content/media/imgs/fifa23/players/p202126.png"
+  },
+  {
+    name: "Victor Osimhen",
+    rating: 88,
+    country: "https://flagcdn.com/ng.svg",
+    position: "ST",
+    team: "Napoli",
+    image: "https://www.fifacm.com/content/media/imgs/fifa23/players/p235805.png"
+  },
+  {
+    name: "Gabriel Jesus",
+    rating: 85,
+    country: "https://flagcdn.com/br.svg",
+    position: "ST",
+    team: "Arsenal",
+    image: "https://www.fifacm.com/content/media/imgs/fifa23/players/p230666.png"
+  },
+  {
+    name: "Darwin Núñez",
+    rating: 84,
+    country: "https://flagcdn.com/uy.svg",
+    position: "ST",
+    team: "Liverpool",
+    image: "https://www.fifacm.com/content/media/imgs/fifa23/players/p247819.png"
+  }
+];
 
-    #playerInfo {
-      display: none;
-      text-align: center;
-      background-color: rgba(0, 0, 0, 0.8);
-      padding: 20px;
-      border-radius: 5px;
-      opacity: 0;
-      transition: all 0.5s ease-in-out;
-    }
+// Helper Functions
+function getPackProbabilities(packType: string) {
+  switch (packType) {
+    case 'low':
+      return { 99: 0.01, 90: 0.05, 85: 0.14, 80: 0.80 };
+    case 'medium':
+      return { 99: 0.03, 90: 0.10, 85: 0.27, 80: 0.60 };
+    case 'high':
+      return { 99: 0.05, 90: 0.15, 85: 0.40, 80: 0.40 };
+    default:
+      return { 99: 0.01, 90: 0.05, 85: 0.14, 80: 0.80 };
+  }
+}
 
-    #playerInfo.show {
-      display: block;
-      opacity: 1;
-    }
+function calculatePlayerPrice(rating: number): number {
+  if (rating >= 99) return 1000;
+  if (rating >= 90) return 500;
+  if (rating >= 85) return 250;
+  if (rating >= 80) return 100;
+  return 50;
+}
 
-    #country, #position, #team, #name, #playerRating {
-      font-size: 24px;
-      margin-bottom: 10px;
-    }
-
-    #playerImage {
-      width: 150px;
-      border-radius: 5px;
-      margin-top: 20px;
-      opacity: 0;
-      transition: opacity 0.5s ease-in-out;
-    }
-
-    #playerImage.show {
-      opacity: 1;
-    }
-
-    .coins-gems {
-      margin-bottom: 20px;
-    }
-
-    #club {
-      margin-top: 20px;
-      padding: 20px;
-      background-color: rgba(0, 0, 0, 0.8);
-      border-radius: 5px;
-      display: none;
-    }
-
-    #club.show {
-      display: block;
-    }
-
-    .hidden {
-      display: none;
-    }
-
-    #formation {
-      font-size: 18px;
-      color: #ccc;
-    }
-
-    #playButton {
-      margin-top: 20px;
-      padding: 10px 20px;
-      background-color: #007BFF;
-      color: white;
-      font-size: 18px;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-    }
-
-    #playButton:disabled {
-      background-color: #ccc;
-      cursor: not-allowed;
-    }
-
-    #botInfo {
-      margin-top: 20px;
-      font-size: 20px;
-    }
-
-    #transferMarket {
-      margin-top: 20px;
-      padding: 20px;
-      background-color: rgba(0, 0, 0, 0.8);
-      border-radius: 5px;
-      display: none;
-    }
-
-    #transferMarket.show {
-      display: block;
-    }
-  </style>
-</head>
-<body>
-
-  <h1>FIFA Pack Simulator</h1>
-
-  <div class="coins-gems">
-    <p>Coins: <span id="coins">200</span> | Gems: <span id="gems">25</span> | Credits: <span id="credits">0</span></p>
-  </div>
-
-  <div class="pack-container">
-    <div class="pack" onclick="openPack('low')">Low Tier Pack (Cost: 10 Coins)</div>
-    <div class="pack" onclick="openPack('medium')">Medium Tier Pack (Cost: 25 Coins)</div>
-    <div class="pack" onclick="openPack('high')">High Tier Pack (Cost: 50 Coins)</div>
-  </div>
-
-  <div id="playerInfo">
-    <h2>Player Information</h2>
-    <p id="name"></p>
-    <img id="country" src="" alt="Country" style="width: 100px;">
-    <p id="position"></p>
-    <p id="team"></p>
-    <p id="playerRating"></p>
-    <img id="playerImage" src="" alt="Player Image">
-  </div>
-
-  <div id="club">
-    <h2>Your Club</h2>
-    <p id="formation">Formation: 4-3-3</p>
-    <div id="teamMembers">
-      <p>Team Members:</p>
-      <!-- Player names will be dynamically added here -->
+// Components
+function PlayerCard({ player, onClose }: { player: Player; onClose: () => void }) {
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+      <div className="bg-gray-800 p-8 rounded-lg relative max-w-md w-full">
+        <button
+          onClick={onClose}
+          className="absolute top-4 right-4 text-gray-400 hover:text-white"
+        >
+          <X size={24} />
+        </button>
+        
+        <div className="text-center">
+          <h2 className="text-2xl font-bold mb-4">{player.name}</h2>
+          <img
+            src={player.country}
+            alt="Country flag"
+            className="w-16 h-auto mx-auto mb-4"
+          />
+          <img
+            src={player.image}
+            alt={player.name}
+            className="w-48 h-48 object-cover mx-auto rounded-lg mb-4"
+          />
+          <div className="space-y-2">
+            <p>Position: {player.position}</p>
+            <p>Team: {player.team}</p>
+            <p>Rating: {player.rating}</p>
+          </div>
+        </div>
+      </div>
     </div>
-    <button onclick="toggleViewTransferMarket()">View Transfer Market</button>
-  </div>
+  );
+}
 
-  <div id="transferMarket">
-    <h2>Transfer Market</h2>
-    <div id="marketPlayers">
-      <p>Players Available for Purchase:</p>
-      <!-- Market players will be dynamically added here -->
+function PackOpening({ pack, onOpen }: { pack: Pack; onOpen: () => void }) {
+  return (
+    <button
+      onClick={onOpen}
+      className="bg-gray-800 p-6 rounded-lg flex flex-col items-center gap-4 hover:bg-gray-700 transition-colors"
+    >
+      <Package size={48} className="text-purple-500" />
+      <div className="text-center">
+        <h3 className="text-xl font-semibold mb-2">{pack.label}</h3>
+        <p className="text-gray-400">Cost: {pack.cost} Coins</p>
+      </div>
+    </button>
+  );
+}
+
+function Club({ players, onClose, credits, setCredits, setPlayers }: {
+  players: Player[];
+  onClose: () => void;
+  credits: number;
+  setCredits: (credits: number) => void;
+  setPlayers: (players: Player[]) => void;
+}) {
+  const calculateUpgradeCost = (rating: number) => (rating - 80) * 10;
+
+  const upgradePlayer = (index: number) => {
+    const player = players[index];
+    const cost = calculateUpgradeCost(player.rating);
+    
+    if (credits >= cost && player.rating < 104) {
+      setCredits(credits - cost);
+      const updatedPlayers = [...players];
+      updatedPlayers[index] = { ...player, rating: player.rating + 1 };
+      setPlayers(updatedPlayers);
+    } else {
+      alert('Not enough credits or maximum upgrade reached!');
+    }
+  };
+
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center overflow-auto">
+      <div className="bg-gray-800 p-8 rounded-lg relative max-w-4xl w-full m-4">
+        <button
+          onClick={onClose}
+          className="absolute top-4 right-4 text-gray-400 hover:text-white"
+        >
+          <X size={24} />
+        </button>
+        
+        <h2 className="text-2xl font-bold mb-6">Your Club</h2>
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {players.map((player, index) => (
+            <div key={index} className="bg-gray-700 p-4 rounded-lg">
+              <img
+                src={player.image}
+                alt={player.name}
+                className="w-full h-48 object-cover rounded-lg mb-4"
+              />
+              <div className="space-y-2">
+                <h3 className="font-semibold">{player.name}</h3>
+                <p>Rating: {player.rating}</p>
+                <button
+                  onClick={() => upgradePlayer(index)}
+                  className="flex items-center gap-2 bg-purple-600 hover:bg-purple-700 px-4 py-2 rounded-lg w-full justify-center"
+                >
+                  <ArrowUp size={16} />
+                  Upgrade ({calculateUpgradeCost(player.rating)} credits)
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
     </div>
-    <button onclick="toggleViewTransferMarket()">Close Transfer Market</button>
-  </div>
+  );
+}
 
-  <button id="viewClubButton" onclick="toggleViewClub()">View Club</button>
-  <button id="playButton" onclick="playAgainstBot()">Play Against Bot</button>
+function TransferMarket({ availablePlayers, coins, setCoins, onPlayerBuy, onClose }: {
+  availablePlayers: Player[];
+  coins: number;
+  setCoins: (coins: number) => void;
+  onPlayerBuy: (player: Player) => void;
+  onClose: () => void;
+}) {
+  const buyPlayer = (player: Player) => {
+    const price = calculatePlayerPrice(player.rating);
+    if (coins >= price) {
+      setCoins(coins - price);
+      onPlayerBuy(player);
+    } else {
+      alert('Not enough coins to buy this player!');
+    }
+  };
 
-  <div id="botInfo"></div>
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center overflow-auto">
+      <div className="bg-gray-800 p-8 rounded-lg relative max-w-4xl w-full m-4">
+        <button
+          onClick={onClose}
+          className="absolute top-4 right-4 text-gray-400 hover:text-white"
+        >
+          <X size={24} />
+        </button>
+        
+        <h2 className="text-2xl font-bold mb-6">Transfer Market</h2>
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {availablePlayers.map((player, index) => (
+            <div key={index} className="bg-gray-700 p-4 rounded-lg">
+              <img
+                src={player.image}
+                alt={player.name}
+                className="w-full h-48 object-cover rounded-lg mb-4"
+              />
+              <div className="space-y-2">
+                <h3 className="font-semibold">{player.name}</h3>
+                <p>Rating: {player.rating}</p>
+                <p>Position: {player.position}</p>
+                <p className="text-yellow-400">Price: {calculatePlayerPrice(player.rating)} coins</p>
+                <button
+                  onClick={() => buyPlayer(player)}
+                  className="flex items-center gap-2 bg-green-600 hover:bg-green-700 px-4 py-2 rounded-lg w-full justify-center"
+                >
+                  <ShoppingCart size={16} />
+                  Buy Now
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
 
-  <script>
-    const playerInfo = document.getElementById('playerInfo');
-    const country = document.getElementById('country');
-    const position = document.getElementById('position');
-    const team = document.getElementById('team');
-    const name = document.getElementById('name');
-    const playerRating = document.getElementById('playerRating');
-    const playerImage = document.getElementById('playerImage');
-    const coinsDisplay = document.getElementById('coins');
-    const gemsDisplay = document.getElementById('gems');
-    const creditsDisplay = document.getElementById('credits');
-    const clubSection = document.getElementById('club');
-    const teamMembers = document.getElementById('teamMembers');
-    const playButton = document.getElementById('playButton');
-    const botInfo = document.getElementById('botInfo');
-    const transferMarket = document.getElementById('transferMarket');
-    const marketPlayers = document.getElementById('marketPlayers');
+// Main App Component
+function App() {
+  const [coins, setCoins] = useState(200);
+  const [gems, setGems] = useState(25);
+  const [credits, setCredits] = useState(0);
+  const [clubPlayers, setClubPlayers] = useState<Player[]>([]);
+  const [selectedPlayer, setSelectedPlayer] = useState<Player | null>(null);
+  const [showClub, setShowClub] = useState(false);
+  const [showMarket, setShowMarket] = useState(false);
+  const [botInfo, setBotInfo] = useState('');
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [timer, setTimer] = useState(30);
+  const [matchScore, setMatchScore] = useState({ player: 0, bot: 0 });
 
-    let coins = 200;
-    let gems = 25;
-    let credits = 0;
-    let clubPlayers = [];
-    let isPackOpen = false;
-    let market = [];
+  const packs: Pack[] = [
+    { type: 'low', cost: 10, credits: 5, label: 'Low Tier Pack' },
+    { type: 'medium', cost: 25, credits: 15, label: 'Medium Tier Pack' },
+    { type: 'high', cost: 50, credits: 30, label: 'High Tier Pack' }
+  ];
 
-    const players = [
-      { name: "Lionel Messi", rating: 99, country: "images/Argentina.png", position: "RW", team: "Inter Miami", image: "images/Messi.jpg" },
-      { name: "Kylian Mbappé", rating: 98, country: "images/France.png", position: "ST", team: "Paris Saint-Germain", image: "images/Mbappé.jpg" },
-      { name: "Pelé", rating: 98, country: "images/Brazil.png", position: "ST", team: "Icon.jpg", image: "images/Pelé.jpg" },
-      { name: "Cristiano Ronaldo", rating: 98, country: "images/Portugal.png", position: "ST", team: "Al Nassr", image: "images/Ronaldo.jpg" },
-      { name: "Kevin De Bruyne", rating: 95, country: "images/Belgium.png", position: "CM", team: "Manchester City", image: "images/KDB.jpg" },
-      { name: "Kaká", rating: 94, country: "images/Brazil.png", position: "CAM", team: "Icon.jpg", image: "images/Kaká.jpg" },
-      { name: "Roberto Carlos", rating: 93, country: "images/Brazil.png", position: "LB", team: "Icon.jpg", image: "images/Roberto_Carlos.jpg" },
-      { name: "Paolo Maldini", rating: 93, country: "images/Italy.png", position: "CB", team: "Icon.jpg", image: "images/Maldini.jpg" },
-      { name: "Casemiro", rating: 89, country: "images/Brazil.png", position: "CDM", team: "Manchester United", image: "images/Casemiro.jpg" },
-      { name: "André Onana", rating: 88, country: "images/Cameroon.png", position: "GK", team: "Manchester United", image: "images/Onana.jpg" },
-      { name: "Lamine Yamal", rating: 82, country: "images/Spain.png", position: "LW", team: "FC Barcelona", image: "images/Yamal.jpg" },
-      { name: "Rodrygo", rating: 87, country: "images/Brazil.png", position: "RW", team: "Real Madrid", image: "images/Rodrygo.jpg" },
-      { name: "Rodri", rating: 88, country: "images/Spain.png", position: "CDM", team: "Manchester City", image: "images/Rodri.jpg" },
-      { name: "Ruben Dias", rating: 87, country: "images/Portugal.png", position: "CB", team: "Manchester City", image: "images/Dias.jpg" },
-      { name: "Alphonso Davies", rating: 88, country: "images/Canada.png", position: "LB", team: "Bayern Munich", image: "images/Davies.jpg" },
-      { name: "Lev Yashin", rating: 94, country: "images/Russia.png", position: "GK", team: "Icon.jpg", image: "images/Yashin.jpg" },
-      { name: "Joshua Kimmich", rating: 90, country: "images/Germany.png", position: "CM", team: "Bayern Munich", image: "images/Kimmich.jpg" },
-      { name: "Dani Carvajal", rating: 88, country: "images/Spain.png", position: "RB", team: "Real Madrid", image: "images/Carvajal.jpg" },
-      { name: "David Alaba", rating: 89, country: "images/Austria.png", position: "CB", team: "Real Madrid", image: "images/Alaba.jpg" },
-      { name: "Jan Oblak", rating: 91, country: "images/Slovenia.png", position: "GK", team: "Atletico Madrid", image: "images/Oblak.jpg" }
-    ];
+  useEffect(() => {
+    let interval: number;
+    if (isPlaying && timer > 0) {
+      interval = setInterval(() => {
+        setTimer(prev => prev - 1);
+      }, 1000);
+    } else if (timer === 0) {
+      setIsPlaying(false);
+      setTimer(30);
+    }
+    return () => clearInterval(interval);
+  }, [isPlaying, timer]);
 
-    function openPack(packType) {
-      let cost;
-      let rewardCredits;
-      if (packType === 'low') {
-        cost = 10;
-        rewardCredits = 5;
-      } else if (packType === 'medium') {
-        cost = 25;
-        rewardCredits = 15;
-      } else if (packType === 'high') {
-        cost = 50;
-        rewardCredits = 30;
-      }
-
-      if (coins >= cost) {
-        coins -= cost;
-        credits += rewardCredits;
-        coinsDisplay.innerText = coins;
-        creditsDisplay.innerText = credits;
-
-        const randomPlayer = players[Math.floor(Math.random() * players.length)];
-        displayPlayer(randomPlayer);
+  const openPack = (pack: Pack) => {
+    if (coins >= pack.cost) {
+      setCoins(prev => prev - pack.cost);
+      setCredits(prev => prev + pack.credits);
+      
+      const probabilities = getPackProbabilities(pack.type);
+      const rand = Math.random();
+      
+      let playerPool;
+      if (rand < probabilities[99]) {
+        playerPool = players.filter(p => p.rating === 99);
+      } else if (rand < probabilities[99] + probabilities[90]) {
+        playerPool = players.filter(p => p.rating >= 90 && p.rating < 99);
+      } else if (rand < probabilities[99] + probabilities[90] + probabilities[85]) {
+        playerPool = players.filter(p => p.rating >= 85 && p.rating < 90);
       } else {
-        alert('Not enough coins!');
+        playerPool = players.filter(p => p.rating < 85);
       }
+      
+      const randomPlayer = playerPool[Math.floor(Math.random() * playerPool.length)];
+      setSelectedPlayer(randomPlayer);
+      setClubPlayers(prev => [...prev, randomPlayer]);
+    } else {
+      alert('Not enough coins!');
+    }
+  };
+
+  const calculateWinChance = (teamOVR: number, botOVR: number) => {
+    const difference = teamOVR - botOVR;
+    const baseChance = 50;
+    const modifier = difference * 5;
+    return Math.min(Math.max(baseChance + modifier, 10), 90);
+  };
+
+  const simulateGoals = (winChance: number) => {
+    const playerGoals = Math.floor(Math.random() * 5);
+    let botGoals;
+    
+    if (Math.random() * 100 < winChance) {
+      botGoals = Math.max(0, playerGoals - Math.floor(Math.random() * 3));
+    } else {
+      botGoals = playerGoals + 1 + Math.floor(Math.random() * 2);
     }
 
-    function displayPlayer(player) {
-      name.textContent = player.name;
-      country.src = player.country;
-      position.textContent = `Position: ${player.position}`;
-      team.textContent = `Team: ${player.team}`;
-      playerRating.textContent = `Rating: ${player.rating}`;
-      playerImage.src = player.image;
+    return { playerGoals, botGoals };
+  };
 
-      playerInfo.classList.add('show');
-      playerImage.classList.add('show');
-
-      // Add player to club
-      clubPlayers.push(player);
-      updateClub();
+  const playAgainstBot = () => {
+    if (clubPlayers.length < 11) {
+      alert('You need 11 players to play against the bot.');
+      return;
     }
 
-    function updateClub() {
-      teamMembers.innerHTML = '<p>Team Members:</p>';
-      clubPlayers.forEach((player, index) => {
-        const playerElement = document.createElement('div');
-        playerElement.innerHTML = `
-          <p>${player.name}</p>
-          <button onclick="showPlayerStats(${index})">View Stats</button>
-          ${player.team === 'Icon.jpg' ? `<button onclick="sellPlayer(${index})">Sell</button>` : ''}
-        `;
-        teamMembers.appendChild(playerElement);
-      });
-      clubSection.classList.add('show');
+    if (isPlaying) {
+      alert('Please wait for the current match to finish!');
+      return;
     }
 
-    function toggleViewClub() {
-      clubSection.classList.toggle('show');
+    setIsPlaying(true);
+    setTimer(30);
+
+    const teamOVR = clubPlayers.reduce((sum, player) => sum + player.rating, 0) / clubPlayers.length;
+    const botOVR = 85 + Math.floor(Math.random() * 15);
+    const winChance = calculateWinChance(teamOVR, botOVR);
+    const { playerGoals, botGoals } = simulateGoals(winChance);
+
+    setMatchScore({ player: playerGoals, bot: botGoals });
+
+    if (playerGoals > botGoals) {
+      setCoins(prev => prev + 50);
+      setCredits(prev => prev + 20);
+      setBotInfo(`Victory! (${playerGoals}-${botGoals})\nYour team OVR: ${teamOVR.toFixed(1)}\nBot OVR: ${botOVR}\nWin Chance: ${winChance.toFixed(1)}%\nRewards: 50 coins, 20 credits`);
+    } else if (playerGoals < botGoals) {
+      setBotInfo(`Defeat! (${playerGoals}-${botGoals})\nYour team OVR: ${teamOVR.toFixed(1)}\nBot OVR: ${botOVR}\nWin Chance: ${winChance.toFixed(1)}%`);
+    } else {
+      setCoins(prev => prev + 25);
+      setCredits(prev => prev + 10);
+      setBotInfo(`Draw! (${playerGoals}-${botGoals})\nYour team OVR: ${teamOVR.toFixed(1)}\nBot OVR: ${botOVR}\nWin Chance: ${winChance.toFixed(1)}%\nRewards: 25 coins, 10 credits`);
     }
+  };
 
-    function toggleViewTransferMarket() {
-      transferMarket.classList.toggle('show');
-      if (transferMarket.classList.contains('show')) {
-        displayTransferMarket();
-      }
-    }
+  return (
+    <div className="min-h-screen bg-gray-900 text-white p-8">
+      <h1 className="text-4xl font-bold text-center mb-8">FIFA Pack Simulator</h1>
+      
+      <div className="flex justify-center gap-8 mb-8">
+        <div className="flex items-center gap-2">
+          <Coins className="text-yellow-400" />
+          <span>{coins}</span>
+        </div>
+        <div className="flex items-center gap-2">
+          <Gem className="text-purple-400" />
+          <span>{gems}</span>
+        </div>
+        <div className="flex items-center gap-2">
+          <CreditCard className="text-green-400" />
+          <span>{credits}</span>
+        </div>
+      </div>
 
-    function displayTransferMarket() {
-      marketPlayers.innerHTML = '<p>Players Available for Purchase:</p>';
-      players.forEach(player => {
-        if (!clubPlayers.includes(player)) {
-          const playerElement = document.createElement('div');
-          playerElement.innerHTML = `
-            <p>${player.name}</p>
-            <img src="${player.image}" alt="${player.name}" style="width: 50px;">
-            <button onclick="buyPlayer('${player.name}')">Buy</button>
-          `;
-          marketPlayers.appendChild(playerElement);
-        }
-      });
-    }
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        {packs.map((pack) => (
+          <PackOpening
+            key={pack.type}
+            pack={pack}
+            onOpen={() => openPack(pack)}
+          />
+        ))}
+      </div>
 
-    function buyPlayer(playerName) {
-      const player = players.find(p => p.name === playerName);
-      if (player && !clubPlayers.includes(player)) {
-        if (coins >= 50) {
-          coins -= 50;
-          coinsDisplay.innerText = coins;
-          clubPlayers.push(player);
-          updateClub();
-        } else {
-          alert('Not enough coins to buy this player!');
-        }
-      }
-    }
+      {selectedPlayer && (
+        <PlayerCard
+          player={selectedPlayer}
+          onClose={() => setSelectedPlayer(null)}
+        /> )}
 
-    function sellPlayer(index) {
-      if (clubPlayers[index].team === 'Icon.jpg') {
-        coins += 100;
-        coinsDisplay.innerText = coins;
-        clubPlayers.splice(index, 1);
-        updateClub();
-      }
-    }
+      <div className="flex justify-center gap-4 mb-8">
+        <button
+          onClick={() => setShowClub(!showClub)}
+          className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 px-6 py-3 rounded-lg"
+        >
+          <Users size={20} />
+          View Club
+        </button>
+        <button
+          onClick={() => setShowMarket(!showMarket)}
+          className="flex items-center gap-2 bg-green-600 hover:bg-green-700 px-6 py-3 rounded-lg"
+        >
+          <ShoppingCart size={20} />
+          Transfer Market
+        </button>
+        <button
+          onClick={playAgainstBot}
+          disabled={isPlaying || clubPlayers.length < 11}
+          className="bg-purple-600 hover:bg-purple-700 disabled:bg-gray-600 px-6 py-3 rounded-lg flex items-center gap-2"
+        >
+          Play Against Bot {isPlaying && `(${timer}s)`}
+        </button>
+      </div>
 
-    function showPlayerStats(index) {
-      const player = clubPlayers[index];
-      const playerStats = `
-        <h2>${player.name}</h2>
-        <img src="${player.image}" alt="${player.name}" style="width: 100px;">
-        <p>Country: <img src="${player.country}" alt="${player.country}" style="width: 20px;"></p>
-        <p>Position: ${player.position}</p>
-        <p>Team: ${player.team}</p>
-        <p>Rating: ${player.rating}</p>
-        <button onclick="upgradePlayer(${index})">Upgrade OVR (${calculateUpgradeCost(player.rating)})</button>
-      `;
-      document.querySelector('#playerInfo').innerHTML = playerStats;
-      playerInfo.classList.add('show');
-    }
+      {botInfo && (
+        <div className="text-center space-y-2 mb-8">
+          <div className="text-3xl font-bold mb-4">
+            {matchScore.player} - {matchScore.bot}
+          </div>
+          <div className="text-xl whitespace-pre-line p-4 bg-gray-800 rounded-lg">
+            {botInfo}
+          </div>
+        </div>
+      )}
 
-    function calculateUpgradeCost(currentRating) {
-      return (currentRating - 80) * 10;  // Example cost calculation: 10 credits per point above 80 OVR
-    }
+      {showClub && (
+        <Club
+          players={clubPlayers}
+          onClose={() => setShowClub(false)}
+          credits={credits}
+          setCredits={setCredits}
+          setPlayers={setClubPlayers}
+        />
+      )}
 
-    function upgradePlayer(index) {
-      const player = clubPlayers[index];
-      const upgradeCost = calculateUpgradeCost(player.rating);
-      if (credits >= upgradeCost && player.rating < 104) {  // Max upgrade to 104 (99 + 5)
-        credits -= upgradeCost;
-        creditsDisplay.innerText = credits;
-        player.rating += 1;
-        showPlayerStats(index);
-        updateClub();
-      } else {
-        alert('Not enough credits or maximum upgrade reached!');
-      }
-    }
+      {showMarket && (
+        <TransferMarket
+          availablePlayers={players.filter(p => !clubPlayers.includes(p))}
+          coins={coins}
+          setCoins={setCoins}
+          onPlayerBuy={(player) => setClubPlayers(prev => [...prev, player])}
+          onClose={() => setShowMarket(false)}
+        />
+      )}
+    </div>
+  );
+}
 
-    function playAgainstBot() {
-      if (clubPlayers.length < 11) {
-        alert('You need 11 players to play against the bot.');
-        return;
-      }
-
-      const teamOVR = clubPlayers.reduce((sum, player) => sum + player.rating, 0) / clubPlayers.length;
-      const botOVR = 85 + Math.floor(Math.random() * 15); // Bot OVR between 85 and 100
-
-      if (teamOVR > botOVR) {
-        coins += 50;
-        credits += 20;
-        botInfo.textContent = `You won! Your team OVR: ${teamOVR.toFixed(2)}, Bot OVR: ${botOVR}. You earned 50 coins and 20 credits.`;
-      } else {
-        botInfo.textContent = `You lost! Your team OVR: ${teamOVR.toFixed(2)}, Bot OVR: ${botOVR}. Better luck next time.`;
-      }
-
-      coinsDisplay.innerText = coins;
-      creditsDisplay.innerText = credits;
-    }
-  </script>
-</body>
-</html>
+export default App;
