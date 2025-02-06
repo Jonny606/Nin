@@ -1,3 +1,7 @@
+<!Doctype html>
+<html></html>
+<head></head>
+<body>
 import React, { useState, useEffect } from 'react';
 import { Package, Coins, Gem, CreditCard, Users, ShoppingCart, X, ArrowUp } from 'lucide-react';
 
@@ -791,3 +795,5 @@ function App() {
 }
 
 export default App;
+</body>
+</html>
