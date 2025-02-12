@@ -1,0 +1,371 @@
+// eslint.config.js
+import js from '@eslint/js';
+import globals from 'globals';
+import reactHooks from 'eslint-plugin-react-hooks';
+import reactRefresh from 'eslint-plugin-react-refresh';
+import tseslint from 'typescript-eslint';
+
+export default tseslint.config(
+  { ignores: ['dist'] },
+  {
+    extends: [js.configs.recommended, ...tseslint.configs.recommended],
+    files: ['**/*.{ts,tsx}'],
+    languageOptions: {
+      ecmaVersion: 2020,
+      globals: globals.browser,
+    },
+    plugins: {
+      'react-hooks': reactHooks,
+      'react-refresh': reactRefresh,
+    },
+    rules: {
+      ...reactHooks.configs.recommended.rules,
+      'react-refresh/only-export-components': [
+        'warn',
+        { allowConstantExport: true },
+      ],
+    },
+  }
+);
+
+// index.html
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Vite + React + TS</title>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
+
+// package.json
+{
+  "name": "vite-react-typescript-starter",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "lint": "eslint .",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "lucide-react": "^0.344.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.9.1",
+    "@types/react": "^18.3.5",
+    "@types/react-dom": "^18.3.0",
+    "@vitejs/plugin-react": "^4.3.1",
+    "autoprefixer": "^10.4.18",
+    "eslint": "^9.9.1",
+    "eslint-plugin-react-hooks": "^5.1.0-rc.0",
+    "eslint-plugin-react-refresh": "^0.4.11",
+    "globals": "^15.9.0",
+    "postcss": "^8.4.35",
+    "tailwindcss": "^3.4.1",
+    "typescript": "^5.5.3",
+    "typescript-eslint": "^8.3.0",
+    "vite": "^5.4.2"
+  }
+}
+
+// postcss.config.js
+export default {
+  plugins: {
+    tailwindcss: {},
+    autoprefixer: {},
+  },
+};
+
+// src/App.tsx
+import React from 'react';
+import { GameCard } from './components/GameCard';
+import { TowerControl as Controller, Gamepad2, Car, Cookie, Sword, ShoppingBasket as Basketball, FolderRoot as Football, Pizza, Train, Blocks, Dices, Tangent as Tank, Swords } from 'lucide-react';
+
+const games = [
+  {
+    title: "Roblox",
+    description: "Play Roblox through now.gg - Create, play, and share 3D experiences",
+    icon: <Blocks className="w-6 h-6" />,
+    url: "https://now.gg/apps/roblox-corporation/5349/roblox.html",
+    category: "Adventure"
+  },
+  {
+    title: "1v1.LOL",
+    description: "Build, fight, and compete in this fast-paced building battle game",
+    icon: <Sword className="w-6 h-6" />,
+    url: "https://1v1.lol",
+    category: "Battle"
+  },
+  {
+    title: "Basketball Random",
+    description: "Play crazy basketball matches with unique physics",
+    icon: <Basketball className="w-6 h-6" />,
+    url: "https://www.crazygames.com/game/basketball-random",
+    category: "Sports"
+  },
+  {
+    title: "Soccer Random",
+    description: "Enjoy unpredictable soccer matches with fun physics",
+    icon: <Football className="w-6 h-6" />,
+    url: "https://www.crazygames.com/game/soccer-random",
+    category: "Sports"
+  },
+  {
+    title: "Papa Louie 1",
+    description: "Help Papa Louie escape in this classic platformer",
+    icon: <Pizza className="w-6 h-6" />,
+    url: "https://www.coolmathgames.com/0-papa-louie-when-pizzas-attack",
+    category: "Adventure"
+  },
+  {
+    title: "Papa Louie 2",
+    description: "Continue Papa's adventure in this exciting sequel",
+    icon: <Pizza className="w-6 h-6" />,
+    url: "https://www.coolmathgames.com/0-papa-louie-2-when-burgers-attack",
+    category: "Adventure"
+  },
+  {
+    title: "Subway Surfers",
+    description: "Run, dodge, and surf through the subway in this endless runner",
+    icon: <Train className="w-6 h-6" />,
+    url: "https://www.kiloo.com/subway-surfers/",
+    category: "Runner"
+  },
+  {
+    title: "Idle Breakout",
+    description: "Break bricks and upgrade your ball in this idle game",
+    icon: <Controller className="w-6 h-6" />,
+    url: "https://www.crazygames.com/game/idle-breakout",
+    category: "Idle"
+  },
+  {
+    title: "Infinite Craft",
+    description: "Craft endless combinations in this creative game",
+    icon: <Dices className="w-6 h-6" />,
+    url: "https://neal.fun/infinite-craft/",
+    category: "Puzzle"
+  },
+  {
+    title: "Cookie Clicker",
+    description: "Click cookies and build an empire in this addictive idle game",
+    icon: <Cookie className="w-6 h-6" />,
+    url: "https://orteil.dashnet.org/cookieclicker/",
+    category: "Idle"
+  },
+  {
+    title: "Retro Bowl",
+    description: "Experience retro-style American football management",
+    icon: <Gamepad2 className="w-6 h-6" />,
+    url: "https://www.crazygames.com/game/retro-bowl",
+    category: "Sports"
+  },
+  {
+    title: "CSGO Clicker",
+    description: "Click and collect CSGO skins in this idle game",
+    icon: <Tank className="w-6 h-6" />,
+    url: "https://csgo.gallery",
+    category: "Idle"
+  },
+  {
+    title: "Smash Karts",
+    description: "Battle other players in this multiplayer kart combat game",
+    icon: <Car className="w-6 h-6" />,
+    url: "https://smashkarts.io",
+    category: "Racing"
+  }
+];
+
+function App() {
+  const [selectedCategory, setSelectedCategory] = React.useState("All");
+  const categories = ["All", ...new Set(games.map(game => game.category))];
+
+  const filteredGames = selectedCategory === "All" 
+    ? games 
+    : games.filter(game => game.category === selectedCategory);
+
+  return (
+    <div className="min-h-screen bg-gray-900 text-white">
+      {/* Header */}
+      <header className="bg-gray-800 py-6">
+        <div className="container mx-auto px-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-2">
+              <Swords className="w-8 h-8 text-purple-500" />
+              <h1 className="text-2xl font-bold">GameHub</h1>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      {/* Category Filter */}
+      <div className="container mx-auto px-4 py-6">
+        <div className="flex flex-wrap gap-2 mb-6">
+          {categories.map(category => (
+            <button
+              key={category}
+              onClick={() => setSelectedCategory(category)}
+              className={`px-4 py-2 rounded-full text-sm font-medium transition-colors
+                ${selectedCategory === category 
+                  ? 'bg-purple-500 text-white' 
+                  : 'bg-gray-700 text-gray-300 hover:bg-gray-600'}`}
+            >
+              {category}
+            </button>
+          ))}
+        </div>
+
+        {/* Games Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          {filteredGames.map((game, index) => (
+            <GameCard key={index} {...game} />
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export default App;
+
+// src/components/GameCard.tsx
+import React from 'react';
+
+interface GameCardProps {
+  title: string;
+  description: string;
+  icon: React.ReactNode;
+  url: string;
+  category: string;
+}
+
+export function GameCard({ title, description, icon, url, category }: GameCardProps) {
+  return (
+    <a
+      href={url}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="block bg-gray-800 rounded-lg overflow-hidden transition-transform hover:scale-105 hover:shadow-xl"
+    >
+      <div className="p-6">
+        <div className="flex items-center justify-between mb-4">
+          <div className="p-2 bg-purple-500 rounded-lg">
+            {icon}
+          </div>
+          <span className="text-sm text-purple-400">{category}</span>
+        </div>
+        <h3 className="text-xl font-semibold mb-2">{title}</h3>
+        <p className="text-gray-400 text-sm">{description}</p>
+      </div>
+      <div className="px-6 py-4 bg-gray-700 bg-opacity-50">
+        <span className="text-sm font-medium text-purple-400">Play Now →</span>
+      </div>
+    </a>
+  );
+}
+
+// src/index.css
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+// src/main.tsx
+import { StrictMode } from 'react';
+import { createRoot } from 'react-dom/client';
+import App from './App.tsx';
+import './index.css';
+
+createRoot(document.getElementById('root')!).render(
+  <StrictMode>
+    <App />
+  </StrictMode>
+);
+
+// tailwind.config.js
+/** @type {import('tailwindcss').Config} */
+export default {
+  content: ['./index.html', './src/**/*.{js,ts,jsx,tsx}'],
+  theme: {
+    extend: {},
+  },
+  plugins: [],
+};
+
+// tsconfig.app.json
+{
+  "compilerOptions": {
+    "target": "ES2020",
+    "useDefineForClassFields": true,
+    "lib": ["ES2020", "DOM", "DOM.Iterable"],
+    "module": "ESNext",
+    "skipLibCheck": true,
+
+    /* Bundler mode */
+    "moduleResolution": "bundler",
+    "allowImportingTsExtensions": true,
+    "isolatedModules": true,
+    "moduleDetection": "force",
+    "noEmit": true,
+    "jsx": "react-jsx",
+
+    /* Linting */
+    "strict": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noFallthroughCasesInSwitch": true
+  },
+  "include": ["src"]
+}
+
+// tsconfig.json
+{
+  "files": [],
+  "references": [
+    { "path": "./tsconfig.app.json" },
+    { "path": "./tsconfig.node.json" }
+  ]
+}
+
+// tsconfig.node.json
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "lib": ["ES2023"],
+    "module": "ESNext",
+    "skipLibCheck": true,
+
+    /* Bundler mode */
+    "moduleResolution": "bundler",
+    "allowImportingTsExtensions": true,
+    "isolatedModules": true,
+    "moduleDetection": "force",
+    "noEmit": true,
+
+    /* Linting */
+    "strict": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noFallthroughCasesInSwitch": true
+  },
+  "include": ["vite.config.ts"]
+}
+
+// vite.config.ts
+import { defineConfig } from 'vite';
+import react from '@vitejs/plugin-react';
+
+export default defineConfig({
+  plugins: [react()],
+  optimizeDeps: {
+    exclude: ['lucide-react'],
+  },
+});
