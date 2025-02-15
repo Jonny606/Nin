@@ -1,233 +1,138 @@
-// eslint.config.js
-import js from '@eslint/js';
-import globals from 'globals';
-import reactHooks from 'eslint-plugin-react-hooks';
-import reactRefresh from 'eslint-plugin-react-refresh';
-import tseslint from 'typescript-eslint';
+import React, { useState, useEffect } from 'react';
+import { Package, Coins, Gem, CreditCard, Users, ShoppingCart, X, ArrowUp, Trophy } from 'lucide-react';
+import { players } from './data/players';
+import { Player, Pack } from './types';
+import { Tournament } from './components/Tournament';
 
-export default tseslint.config(
-  { ignores: ['dist'] },
-  {
-    extends: [js.configs.recommended, ...tseslint.configs.recommended],
-    files: ['**/*.{ts,tsx}'],
-    languageOptions: {
-      ecmaVersion: 2020,
-      globals: globals.browser,
-    },
-    plugins: {
-      'react-hooks': reactHooks,
-      'react-refresh': reactRefresh,
-    },
-    rules: {
-      ...reactHooks.configs.recommended.rules,
-      'react-refresh/only-export-components': [
-        'warn',
-        { allowConstantExport: true },
-      ],
-    },
-  }
-);
-
-// index.html
-<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Vite + React + TS</title>
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
-  </body>
-</html>
-
-// package.json
-{
-  "name": "vite-react-typescript-starter",
-  "private": true,
-  "version": "0.0.0",
-  "type": "module",
-  "scripts": {
-    "dev": "vite",
-    "build": "vite build",
-    "lint": "eslint .",
-    "preview": "vite preview"
-  },
-  "dependencies": {
-    "lucide-react": "^0.344.0",
-    "react": "^18.3.1",
-    "react-dom": "^18.3.1"
-  },
-  "devDependencies": {
-    "@eslint/js": "^9.9.1",
-    "@types/react": "^18.3.5",
-    "@types/react-dom": "^18.3.0",
-    "@vitejs/plugin-react": "^4.3.1",
-    "autoprefixer": "^10.4.18",
-    "eslint": "^9.9.1",
-    "eslint-plugin-react-hooks": "^5.1.0-rc.0",
-    "eslint-plugin-react-refresh": "^0.4.11",
-    "globals": "^15.9.0",
-    "postcss": "^8.4.35",
-    "tailwindcss": "^3.4.1",
-    "typescript": "^5.5.3",
-    "typescript-eslint": "^8.3.0",
-    "vite": "^5.4.2"
+// Helper Functions
+function getPackProbabilities(packType: string) {
+  switch (packType) {
+    case 'low':
+      return { 99: 0.01, 90: 0.05, 85: 0.14, 80: 0.80 };
+    case 'medium':
+      return { 99: 0.03, 90: 0.10, 85: 0.27, 80: 0.60 };
+    case 'high':
+      return { 99: 0.05, 90: 0.15, 85: 0.40, 80: 0.40 };
+    default:
+      return { 99: 0.01, 90: 0.05, 85: 0.14, 80: 0.80 };
   }
 }
 
-// postcss.config.js
-export default {
-  plugins: {
-    tailwindcss: {},
-    autoprefixer: {},
-  },
-};
+function calculatePlayerPrice(rating: number): number {
+  if (rating >= 99) return 1000;
+  if (rating >= 90) return 500;
+  if (rating >= 85) return 250;
+  if (rating >= 80) return 100;
+  return 50;
+}
 
-// src/App.tsx
-import React from 'react';
-import { GameCard } from './components/GameCard';
-import { TowerControl as Controller, Gamepad2, Car, Cookie, Sword, ShoppingBasket as Basketball, FolderRoot as Football, Pizza, Train, Blocks, Dices, Tangent as Tank, Swords } from 'lucide-react';
-
-const games = [
-  {
-    title: "Roblox",
-    description: "Play Roblox through now.gg - Create, play, and share 3D experiences",
-    icon: <Blocks className="w-6 h-6" />,
-    url: "https://now.gg/apps/roblox-corporation/5349/roblox.html",
-    category: "Adventure"
-  },
-  {
-    title: "1v1.LOL",
-    description: "Build, fight, and compete in this fast-paced building battle game",
-    icon: <Sword className="w-6 h-6" />,
-    url: "https://1v1.lol",
-    category: "Battle"
-  },
-  {
-    title: "Basketball Random",
-    description: "Play crazy basketball matches with unique physics",
-    icon: <Basketball className="w-6 h-6" />,
-    url: "https://www.crazygames.com/game/basketball-random",
-    category: "Sports"
-  },
-  {
-    title: "Soccer Random",
-    description: "Enjoy unpredictable soccer matches with fun physics",
-    icon: <Football className="w-6 h-6" />,
-    url: "https://www.crazygames.com/game/soccer-random",
-    category: "Sports"
-  },
-  {
-    title: "Papa Louie 1",
-    description: "Help Papa Louie escape in this classic platformer",
-    icon: <Pizza className="w-6 h-6" />,
-    url: "https://www.coolmathgames.com/0-papa-louie-when-pizzas-attack",
-    category: "Adventure"
-  },
-  {
-    title: "Papa Louie 2",
-    description: "Continue Papa's adventure in this exciting sequel",
-    icon: <Pizza className="w-6 h-6" />,
-    url: "https://www.coolmathgames.com/0-papa-louie-2-when-burgers-attack",
-    category: "Adventure"
-  },
-  {
-    title: "Subway Surfers",
-    description: "Run, dodge, and surf through the subway in this endless runner",
-    icon: <Train className="w-6 h-6" />,
-    url: "https://www.kiloo.com/subway-surfers/",
-    category: "Runner"
-  },
-  {
-    title: "Idle Breakout",
-    description: "Break bricks and upgrade your ball in this idle game",
-    icon: <Controller className="w-6 h-6" />,
-    url: "https://www.crazygames.com/game/idle-breakout",
-    category: "Idle"
-  },
-  {
-    title: "Infinite Craft",
-    description: "Craft endless combinations in this creative game",
-    icon: <Dices className="w-6 h-6" />,
-    url: "https://neal.fun/infinite-craft/",
-    category: "Puzzle"
-  },
-  {
-    title: "Cookie Clicker",
-    description: "Click cookies and build an empire in this addictive idle game",
-    icon: <Cookie className="w-6 h-6" />,
-    url: "https://orteil.dashnet.org/cookieclicker/",
-    category: "Idle"
-  },
-  {
-    title: "Retro Bowl",
-    description: "Experience retro-style American football management",
-    icon: <Gamepad2 className="w-6 h-6" />,
-    url: "https://www.crazygames.com/game/retro-bowl",
-    category: "Sports"
-  },
-  {
-    title: "CSGO Clicker",
-    description: "Click and collect CSGO skins in this idle game",
-    icon: <Tank className="w-6 h-6" />,
-    url: "https://csgo.gallery",
-    category: "Idle"
-  },
-  {
-    title: "Smash Karts",
-    description: "Battle other players in this multiplayer kart combat game",
-    icon: <Car className="w-6 h-6" />,
-    url: "https://smashkarts.io",
-    category: "Racing"
-  }
-];
-
-function App() {
-  const [selectedCategory, setSelectedCategory] = React.useState("All");
-  const categories = ["All", ...new Set(games.map(game => game.category))];
-
-  const filteredGames = selectedCategory === "All" 
-    ? games 
-    : games.filter(game => game.category === selectedCategory);
-
+// Components
+function PlayerCard({ player, onClose }: { player: Player; onClose: () => void }) {
   return (
-    <div className="min-h-screen bg-gray-900 text-white">
-      {/* Header */}
-      <header className="bg-gray-800 py-6">
-        <div className="container mx-auto px-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-2">
-              <Swords className="w-8 h-8 text-purple-500" />
-              <h1 className="text-2xl font-bold">GameHub</h1>
-            </div>
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+      <div className="bg-gray-800 p-8 rounded-lg relative max-w-md w-full">
+        <button
+          onClick={onClose}
+          className="absolute top-4 right-4 text-gray-400 hover:text-white"
+        >
+          <X size={24} />
+        </button>
+        
+        <div className="text-center">
+          <h2 className="text-2xl font-bold mb-4">{player.name}</h2>
+          <img
+            src={player.country}
+            alt="Country flag"
+            className="w-16 h-auto mx-auto mb-4"
+          />
+          <img
+            src={player.image}
+            alt={player.name}
+            className="w-48 h-48 object-cover mx-auto rounded-lg mb-4"
+          />
+          <div className="space-y-2">
+            <p>Position: {player.position}</p>
+            <p>Team: {player.team}</p>
+            <p>Rating: {player.rating}</p>
           </div>
         </div>
-      </header>
+      </div>
+    </div>
+  );
+}
 
-      {/* Category Filter */}
-      <div className="container mx-auto px-4 py-6">
-        <div className="flex flex-wrap gap-2 mb-6">
-          {categories.map(category => (
-            <button
-              key={category}
-              onClick={() => setSelectedCategory(category)}
-              className={`px-4 py-2 rounded-full text-sm font-medium transition-colors
-                ${selectedCategory === category 
-                  ? 'bg-purple-500 text-white' 
-                  : 'bg-gray-700 text-gray-300 hover:bg-gray-600'}`}
-            >
-              {category}
-            </button>
-          ))}
-        </div>
+function PackOpening({ pack, onOpen }: { pack: Pack; onOpen: () => void }) {
+  return (
+    <button
+      onClick={onOpen}
+      className="bg-gray-800 p-6 rounded-lg flex flex-col items-center gap-4 hover:bg-gray-700 transition-colors"
+    >
+      <Package size={48} className="text-purple-500" />
+      <div className="text-center">
+        <h3 className="text-xl font-semibold mb-2">{pack.label}</h3>
+        <p className="text-gray-400">Cost: {pack.cost} Coins</p>
+      </div>
+    </button>
+  );
+}
 
-        {/* Games Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          {filteredGames.map((game, index) => (
-            <GameCard key={index} {...game} />
+function Club({ players, onClose, credits, setCredits, setPlayers }: {
+  players: Player[];
+  onClose: () => void;
+  credits: number;
+  setCredits: (credits: number) => void;
+  setPlayers: (players: Player[]) => void;
+}) {
+  const calculateUpgradeCost = (rating: number) => (rating - 80) * 10;
+
+  const upgradePlayer = (index: number) => {
+    const player = players[index];
+    if (!player) return;
+    
+    const cost = calculateUpgradeCost(player.rating);
+    
+    if (credits >= cost && player.rating < 104) {
+      setCredits(credits - cost);
+      const updatedPlayers = [...players];
+      updatedPlayers[index] = { ...player, rating: player.rating + 1 };
+      setPlayers(updatedPlayers);
+    } else {
+      alert('Not enough credits or maximum upgrade reached!');
+    }
+  };
+
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center overflow-auto">
+      <div className="bg-gray-800 p-8 rounded-lg relative max-w-4xl w-full m-4">
+        <button
+          onClick={onClose}
+          className="absolute top-4 right-4 text-gray-400 hover:text-white"
+        >
+          <X size={24} />
+        </button>
+        
+        <h2 className="text-2xl font-bold mb-6">Your Club</h2>
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {players.map((player, index) => (
+            <div key={index} className="bg-gray-700 p-4 rounded-lg">
+              <img
+                src={player.image}
+                alt={player.name}
+                className="w-full h-48 object-cover rounded-lg mb-4"
+              />
+              <div className="space-y-2">
+                <h3 className="font-semibold">{player.name}</h3>
+                <p>Rating: {player.rating}</p>
+                <button
+                  onClick={() => upgradePlayer(index)}
+                  className="flex items-center gap-2 bg-purple-600 hover:bg-purple-700 px-4 py-2 rounded-lg w-full justify-center"
+                >
+                  <ArrowUp size={16} />
+                  Upgrade ({calculateUpgradeCost(player.rating)} credits)
+                </button>
+              </div>
+            </div>
           ))}
         </div>
       </div>
@@ -235,137 +140,292 @@ function App() {
   );
 }
 
-export default App;
+function TransferMarket({ availablePlayers, coins, setCoins, onPlayerBuy, onClose }: {
+  availablePlayers: Player[];
+  coins: number;
+  setCoins: (coins: number) => void;
+  onPlayerBuy: (player: Player) => void;
+  onClose: () => void;
+}) {
+  const buyPlayer = (player: Player) => {
+    const price = calculatePlayerPrice(player.rating);
+    if (coins >= price) {
+      setCoins(coins - price);
+      onPlayerBuy(player);
+    } else {
+      alert('Not enough coins to buy this player!');
+    }
+  };
 
-// src/components/GameCard.tsx
-import React from 'react';
-
-interface GameCardProps {
-  title: string;
-  description: string;
-  icon: React.ReactNode;
-  url: string;
-  category: string;
-}
-
-export function GameCard({ title, description, icon, url, category }: GameCardProps) {
   return (
-    <a
-      href={url}
-      target="_blank"
-      rel="noopener noreferrer"
-      className="block bg-gray-800 rounded-lg overflow-hidden transition-transform hover:scale-105 hover:shadow-xl"
-    >
-      <div className="p-6">
-        <div className="flex items-center justify-between mb-4">
-          <div className="p-2 bg-purple-500 rounded-lg">
-            {icon}
-          </div>
-          <span className="text-sm text-purple-400">{category}</span>
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center overflow-auto">
+      <div className="bg-gray-800 p-8 rounded-lg relative max-w-4xl w-full m-4">
+        <button
+          onClick={onClose}
+          className="absolute top-4 right-4 text-gray-400 hover:text-white"
+        >
+          <X size={24} />
+        </button>
+        
+        <h2 className="text-2xl font-bold mb-6">Transfer Market</h2>
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {availablePlayers.map((player, index) => (
+            <div key={index} className="bg-gray-700 p-4 rounded-lg">
+              <img
+                src={player.image}
+                alt={player.name}
+                className="w-full h-48 object-cover rounded-lg mb-4"
+              />
+              <div className="space-y-2">
+                <h3 className="font-semibold">{player.name}</h3>
+                <p>Rating: {player.rating}</p>
+                <p>Position: {player.position}</p>
+                <p className="text-yellow-400">Price: {calculatePlayerPrice(player.rating)} coins</p>
+                <button
+                  onClick={() => buyPlayer(player)}
+                  className="flex items-center gap-2 bg-green-600 hover:bg-green-700 px-4 py-2 rounded-lg w-full justify-center"
+                >
+                  <ShoppingCart size={16} />
+                  Buy Now
+                </button>
+              </div>
+            </div>
+          ))}
         </div>
-        <h3 className="text-xl font-semibold mb-2">{title}</h3>
-        <p className="text-gray-400 text-sm">{description}</p>
       </div>
-      <div className="px-6 py-4 bg-gray-700 bg-opacity-50">
-        <span className="text-sm font-medium text-purple-400">Play Now →</span>
-      </div>
-    </a>
+    </div>
   );
 }
 
-// src/index.css
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+// Main App Component
+function App() {
+  const [coins, setCoins] = useState(200);
+  const [gems, setGems] = useState(25);
+  const [credits, setCredits] = useState(0);
+  const [clubPlayers, setClubPlayers] = useState<Player[]>([]);
+  const [selectedPlayer, setSelectedPlayer] = useState<Player | null>(null);
+  const [showClub, setShowClub] = useState(false);
+  const [showMarket, setShowMarket] = useState(false);
+  const [botInfo, setBotInfo] = useState('');
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [timer, setTimer] = useState(30);
+  const [matchScore, setMatchScore] = useState({ player: 0, bot: 0 });
+  const [showTournament, setShowTournament] = useState(false);
 
-// src/main.tsx
-import { StrictMode } from 'react';
-import { createRoot } from 'react-dom/client';
-import App from './App.tsx';
-import './index.css';
+  const packs: Pack[] = [
+    { type: 'low', cost: 10, credits: 5, label: 'Low Tier Pack' },
+    { type: 'medium', cost: 25, credits: 15, label: 'Medium Tier Pack' },
+    { type: 'high', cost: 50, credits: 30, label: 'High Tier Pack' }
+  ];
 
-createRoot(document.getElementById('root')!).render(
-  <StrictMode>
-    <App />
-  </StrictMode>
-);
+  useEffect(() => {
+    let interval: number;
+    if (isPlaying && timer > 0) {
+      interval = setInterval(() => {
+        setTimer(prev => prev - 1);
+      }, 1000);
+    } else if (timer === 0) {
+      setIsPlaying(false);
+      setTimer(30);
+    }
+    return () => clearInterval(interval);
+  }, [isPlaying, timer]);
 
-// tailwind.config.js
-/** @type {import('tailwindcss').Config} */
-export default {
-  content: ['./index.html', './src/**/*.{js,ts,jsx,tsx}'],
-  theme: {
-    extend: {},
-  },
-  plugins: [],
-};
+  const openPack = (pack: Pack) => {
+    if (coins >= pack.cost) {
+      setCoins(prev => prev - pack.cost);
+      setCredits(prev => prev + pack.credits);
+      
+      const probabilities = getPackProbabilities(pack.type);
+      const rand = Math.random();
+      
+      let playerPool;
+      if (rand < probabilities[99]) {
+        playerPool = players.filter(p => p.rating === 99);
+      } else if (rand < probabilities[99] + probabilities[90]) {
+        playerPool = players.filter(p => p.rating >= 90 && p.rating < 99);
+      } else if (rand < probabilities[99] + probabilities[90] + probabilities[85]) {
+        playerPool = players.filter(p => p.rating >= 85 && p.rating < 90);
+      } else {
+        playerPool = players.filter(p => p.rating < 85);
+      }
+      
+      const randomPlayer = playerPool[Math.floor(Math.random() * playerPool.length)];
+      if (randomPlayer) {
+        setSelectedPlayer(randomPlayer);
+        setClubPlayers(prev => [...prev, randomPlayer]);
+      }
+    } else {
+      alert('Not enough coins!');
+    }
+  };
 
-// tsconfig.app.json
-{
-  "compilerOptions": {
-    "target": "ES2020",
-    "useDefineForClassFields": true,
-    "lib": ["ES2020", "DOM", "DOM.Iterable"],
-    "module": "ESNext",
-    "skipLibCheck": true,
+  const calculateWinChance = (teamOVR: number, botOVR: number) => {
+    const difference = teamOVR - botOVR;
+    const baseChance = 50;
+    const modifier = difference * 5;
+    return Math.min(Math.max(baseChance + modifier, 10), 90);
+  };
 
-    /* Bundler mode */
-    "moduleResolution": "bundler",
-    "allowImportingTsExtensions": true,
-    "isolatedModules": true,
-    "moduleDetection": "force",
-    "noEmit": true,
-    "jsx": "react-jsx",
+  const simulateGoals = (winChance: number) => {
+    const playerGoals = Math.floor(Math.random() * 5);
+    let botGoals;
+    
+    if (Math.random() * 100 < winChance) {
+      botGoals = Math.max(0, playerGoals - Math.floor(Math.random() * 3));
+    } else {
+      botGoals = playerGoals + 1 + Math.floor(Math.random() * 2);
+    }
 
-    /* Linting */
-    "strict": true,
-    "noUnusedLocals": true,
-    "noUnusedParameters": true,
-    "noFallthroughCasesInSwitch": true
-  },
-  "include": ["src"]
+    return { playerGoals, botGoals };
+  };
+
+  const playAgainstBot = () => {
+    if (clubPlayers.length < 11) {
+      alert('You need 11 players to play against the bot.');
+      return;
+    }
+
+    if (isPlaying) {
+      alert('Please wait for the current match to finish!');
+      return;
+    }
+
+    setIsPlaying(true);
+    setTimer(30);
+
+    const teamOVR = clubPlayers.reduce((sum, player) => sum + player.rating, 0) / clubPlayers.length;
+    const botOVR = 85 + Math.floor(Math.random() * 15);
+    const winChance = calculateWinChance(teamOVR, botOVR);
+    const { playerGoals, botGoals } = simulateGoals(winChance);
+
+    setMatchScore({ player: playerGoals, bot: botGoals });
+
+    if (playerGoals > botGoals) {
+      setCoins(prev => prev + 50);
+      setCredits(prev => prev + 20);
+      setBotInfo(`Victory! (${playerGoals}-${botGoals})\nYour team OVR: ${teamOVR.toFixed(1)}\nBot OVR: ${botOVR}\nWin Chance: ${winChance.toFixed(1)}%\nRewards: 50 coins, 20 credits`);
+    } else if (playerGoals < botGoals) {
+      setBotInfo(`Defeat! (${playerGoals}-${botGoals})\nYour team OVR: ${teamOVR.toFixed(1)}\nBot OVR: ${botOVR}\nWin Chance: ${winChance.toFixed(1)}%`);
+    } else {
+      setCoins(prev => prev + 25);
+      setCredits(prev => prev + 10);
+      setBotInfo(`Draw! (${playerGoals}-${botGoals})\nYour team OVR: ${teamOVR.toFixed(1)}\nBot OVR: ${botOVR}\nWin Chance: ${winChance.toFixed(1)}%\nRewards: 25 coins, 10 credits`);
+    }
+  };
+
+  const handleTournamentReward = (coins: number, credits: number) => {
+    setCoins(prev => prev + coins);
+    setCredits(prev => prev + credits);
+  };
+
+  return (
+    <div className="min-h-screen bg-gray-900 text-white p-8">
+      <h1 className="text-4xl font-bold text-center mb-8">FIFA Pack Simulator</h1>
+      
+      <div className="flex justify-center gap-8 mb-8">
+        <div className="flex items-center gap-2">
+          <Coins className="text-yellow-400" />
+          <span>{coins}</span>
+        </div>
+        <div className="flex items-center gap-2">
+          <Gem className="text-purple-400" />
+          <span>{gems}</span>
+        </div>
+        <div className="flex items-center gap-2">
+          <CreditCard className="text-green-400" />
+          <span>{credits}</span>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        {packs.map((pack) => (
+          <PackOpening
+            key={pack.type}
+            pack={pack}
+            onOpen={() => openPack(pack)}
+          />
+        ))}
+      </div>
+
+      {selectedPlayer && (
+        <PlayerCard
+          player={selectedPlayer}
+          onClose={() => setSelectedPlayer(null)}
+        />
+      )}
+
+      <div className="flex justify-center gap-4 mb-8">
+        <button
+          onClick={() => setShowClub(true)}
+          className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 px-6 py-3 rounded-lg"
+        >
+          <Users size={20} />
+          View Club
+        </button>
+        <button
+          onClick={() => setShowMarket(true)}
+          className="flex items-center gap-2 bg-green-600 hover:bg-green-700 px-6 py-3 rounded-lg"
+        >
+          <ShoppingCart size={20} />
+          Transfer Market
+        </button>
+        <button
+          onClick={playAgainstBot}
+          disabled={isPlaying || clubPlayers.length < 11}
+          className="bg-purple-600 hover:bg-purple-700 disabled:bg-gray-600 px-6 py-3 rounded-lg flex items-center gap-2"
+        >
+          Play Against Bot {isPlaying && `(${timer}s)`}
+        </button>
+        <button
+          onClick={() => setShowTournament(true)}
+          className="flex items-center gap-2 bg-yellow-600 hover:bg-yellow-700 px-6 py-3 rounded-lg"
+        >
+          <Trophy size={20} />
+          Tournament Mode
+        </button>
+      </div>
+
+      {botInfo && (
+        <div className="text-center space-y-2 mb-8">
+          <div className="text-3xl font-bold mb-4">
+            {matchScore.player} - {matchScore.bot}
+          </div>
+          <div className="text-xl whitespace-pre-line p-4 bg-gray-800 rounded-lg">
+            {botInfo}
+          </div>
+        </div>
+      )}
+
+      {showClub && (
+        <Club
+          players={clubPlayers}
+          onClose={() => setShowClub(false)}
+          credits={credits}
+          setCredits={setCredits}
+          setPlayers={setClubPlayers}
+        />
+      )}
+
+      {showMarket && (
+        <TransferMarket
+          availablePlayers={players.filter(p => !clubPlayers.some(cp => cp.name === p.name))}
+          coins={coins}
+          setCoins={setCoins}
+          onPlayerBuy={(player) => setClubPlayers(prev => [...prev, player])}
+          onClose={() => setShowMarket(false)}
+        />
+      )}
+
+      {showTournament && (
+        <Tournament
+          onClose={() => setShowTournament(false)}
+          onReward={handleTournamentReward}
+        />
+      )}
+    </div>
+  );
 }
 
-// tsconfig.json
-{
-  "files": [],
-  "references": [
-    { "path": "./tsconfig.app.json" },
-    { "path": "./tsconfig.node.json" }
-  ]
-}
-
-// tsconfig.node.json
-{
-  "compilerOptions": {
-    "target": "ES2022",
-    "lib": ["ES2023"],
-    "module": "ESNext",
-    "skipLibCheck": true,
-
-    /* Bundler mode */
-    "moduleResolution": "bundler",
-    "allowImportingTsExtensions": true,
-    "isolatedModules": true,
-    "moduleDetection": "force",
-    "noEmit": true,
-
-    /* Linting */
-    "strict": true,
-    "noUnusedLocals": true,
-    "noUnusedParameters": true,
-    "noFallthroughCasesInSwitch": true
-  },
-  "include": ["vite.config.ts"]
-}
-
-// vite.config.ts
-import { defineConfig } from 'vite';
-import react from '@vitejs/plugin-react';
-
-export default defineConfig({
-  plugins: [react()],
-  optimizeDeps: {
-    exclude: ['lucide-react'],
-  },
-});
+export default App;
