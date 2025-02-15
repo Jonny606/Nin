@@ -1,443 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FIFA Pack Simulator</title>
+  <script src="https://unpkg.com/react/umd/react.development.js"></script>
+  <script src="https://unpkg.com/react-dom/umd/react-dom.development.js"></script>
+  <script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    body { margin: 0; }
+    canvas { display: block; }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+  <script type="text/babel">
+    import React, { useState, useEffect } from 'react';
+    import { Package, Coins, Gem, CreditCard, Users, ShoppingCart, X, ArrowUp, Trophy } from 'lucide-react';
+    import { players } from './data/players';
+    import { Player, Pack } from './types';
+    import { Tournament } from './components/Tournament';
 
-<!Doctype> <html>
-  <body>
-import React, { useState, useEffect } from 'react';
-import { Package, Coins, Gem, CreditCard, Users, ShoppingCart, X, ArrowUp, Trophy } from 'lucide-react';
-import { players } from './data/players';
-import { Player, Pack } from './types';
-import { Tournament } from './components/Tournament';
-
-// Helper Functions
-function getPackProbabilities(packType: string) {
-  switch (packType) {
-    case 'low':
-      return { 99: 0.01, 90: 0.05, 85: 0.14, 80: 0.80 };
-    case 'medium':
-      return { 99: 0.03, 90: 0.10, 85: 0.27, 80: 0.60 };
-    case 'high':
-      return { 99: 0.05, 90: 0.15, 85: 0.40, 80: 0.40 };
-    default:
-      return { 99: 0.01, 90: 0.05, 85: 0.14, 80: 0.80 };
-  }
-}
-
-function calculatePlayerPrice(rating: number): number {
-  if (rating >= 99) return 1000;
-  if (rating >= 90) return 500;
-  if (rating >= 85) return 250;
-  if (rating >= 80) return 100;
-  return 50;
-}
-
-// Components
-function PlayerCard({ player, onClose }: { player: Player; onClose: () => void }) {
-  return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-      <div className="bg-gray-800 p-8 rounded-lg relative max-w-md w-full">
-        <button
-          onClick={onClose}
-          className="absolute top-4 right-4 text-gray-400 hover:text-white"
-        >
-          <X size={24} />
-        </button>
-        
-        <div className="text-center">
-          <h2 className="text-2xl font-bold mb-4">{player.name}</h2>
-          <img
-            src={player.country}
-            alt="Country flag"
-            className="w-16 h-auto mx-auto mb-4"
-          />
-          <img
-            src={player.image}
-            alt={player.name}
-            className="w-48 h-48 object-cover mx-auto rounded-lg mb-4"
-          />
-          <div className="space-y-2">
-            <p>Position: {player.position}</p>
-            <p>Team: {player.team}</p>
-            <p>Rating: {player.rating}</p>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function PackOpening({ pack, onOpen }: { pack: Pack; onOpen: () => void }) {
-  return (
-    <button
-      onClick={onOpen}
-      className="bg-gray-800 p-6 rounded-lg flex flex-col items-center gap-4 hover:bg-gray-700 transition-colors"
-    >
-      <Package size={48} className="text-purple-500" />
-      <div className="text-center">
-        <h3 className="text-xl font-semibold mb-2">{pack.label}</h3>
-        <p className="text-gray-400">Cost: {pack.cost} Coins</p>
-      </div>
-    </button>
-  );
-}
-
-function Club({ players, onClose, credits, setCredits, setPlayers }: {
-  players: Player[];
-  onClose: () => void;
-  credits: number;
-  setCredits: (credits: number) => void;
-  setPlayers: (players: Player[]) => void;
-}) {
-  const calculateUpgradeCost = (rating: number) => (rating - 80) * 10;
-
-  const upgradePlayer = (index: number) => {
-    const player = players[index];
-    if (!player) return;
-    
-    const cost = calculateUpgradeCost(player.rating);
-    
-    if (credits >= cost && player.rating < 104) {
-      setCredits(credits - cost);
-      const updatedPlayers = [...players];
-      updatedPlayers[index] = { ...player, rating: player.rating + 1 };
-      setPlayers(updatedPlayers);
-    } else {
-      alert('Not enough credits or maximum upgrade reached!');
+    // Helper Functions
+    function getPackProbabilities(packType) {
+      // ... existing code ...
     }
-  };
 
-  return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center overflow-auto">
-      <div className="bg-gray-800 p-8 rounded-lg relative max-w-4xl w-full m-4">
-        <button
-          onClick={onClose}
-          className="absolute top-4 right-4 text-gray-400 hover:text-white"
-        >
-          <X size={24} />
-        </button>
-        
-        <h2 className="text-2xl font-bold mb-6">Your Club</h2>
-        
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {players.map((player, index) => (
-            <div key={index} className="bg-gray-700 p-4 rounded-lg">
-              <img
-                src={player.image}
-                alt={player.name}
-                className="w-full h-48 object-cover rounded-lg mb-4"
-              />
-              <div className="space-y-2">
-                <h3 className="font-semibold">{player.name}</h3>
-                <p>Rating: {player.rating}</p>
-                <button
-                  onClick={() => upgradePlayer(index)}
-                  className="flex items-center gap-2 bg-purple-600 hover:bg-purple-700 px-4 py-2 rounded-lg w-full justify-center"
-                >
-                  <ArrowUp size={16} />
-                  Upgrade ({calculateUpgradeCost(player.rating)} credits)
-                </button>
-              </div>
+    function calculatePlayerPrice(rating) {
+      // ... existing code ...
+    }
+
+    function PlayerCard({ player, onClose }) {
+      // ... existing code ...
+    }
+
+    function PackOpening({ pack, onOpen }) {
+      // ... existing code ...
+    }
+
+    function Club({ players, onClose, credits, setCredits, setPlayers }) {
+      // ... existing code ...
+    }
+
+    function TransferMarket({ availablePlayers, coins, setCoins, onPlayerBuy, onClose }) {
+      // ... existing code ...
+    }
+
+    function PenaltyShooter({ onClose }) {
+      useEffect(() => {
+        // Set up the scene, camera, and renderer
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        document.body.appendChild(renderer.domElement);
+
+        // Add a field
+        const fieldGeometry = new THREE.PlaneGeometry(20, 30);
+        const fieldMaterial = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
+        const field = new THREE.Mesh(fieldGeometry, fieldMaterial);
+        field.rotation.x = -Math.PI / 2;
+        scene.add(field);
+
+        // Add a goalpost
+        const goalGeometry = new THREE.BoxGeometry(8, 4, 0.1);
+        const goalMaterial = new THREE.MeshBasicMaterial({ color: 0xffffff });
+        const goal = new THREE.Mesh(goalGeometry, goalMaterial);
+        goal.position.set(0, 2, -15);
+        scene.add(goal);
+
+        // Add a ball
+        const ballGeometry = new THREE.SphereGeometry(0.5, 32, 32);
+        const ballMaterial = new THREE.MeshBasicMaterial({ color: 0xff0000 });
+        const ball = new THREE.Mesh(ballGeometry, ballMaterial);
+        ball.position.set(0, 0.5, 0);
+        scene.add(ball);
+
+        // Add a player
+        const playerGeometry = new THREE.BoxGeometry(1, 2, 0.5);
+        const playerMaterial = new THREE.MeshBasicMaterial({ color: 0x0000ff });
+        const player = new THREE.Mesh(playerGeometry, playerMaterial);
+        player.position.set(0, 1, 2);
+        scene.add(player);
+
+        // Add a goalie
+        const goalieGeometry = new THREE.BoxGeometry(1, 2, 0.5);
+        const goalieMaterial = new THREE.MeshBasicMaterial({ color: 0x000000 });
+        const goalie = new THREE.Mesh(goalieGeometry, goalieMaterial);
+        goalie.position.set(0, 1, -14.5);
+        scene.add(goalie);
+
+        camera.position.z = 10;
+
+        // Render loop
+        const animate = function () {
+          requestAnimationFrame(animate);
+          renderer.render(scene, camera);
+        };
+
+        animate();
+
+        return () => {
+          document.body.removeChild(renderer.domElement);
+        };
+      }, []);
+
+      return (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+          <button
+            onClick={onClose}
+            className="absolute top-4 right-4 text-gray-400 hover:text-white"
+          >
+            <X size={24} />
+          </button>
+        </div>
+      );
+    }
+
+    function App() {
+      const [coins, setCoins] = useState(200);
+      const [gems, setGems] = useState(25);
+      const [credits, setCredits] = useState(0);
+      const [clubPlayers, setClubPlayers] = useState([]);
+      const [selectedPlayer, setSelectedPlayer] = useState(null);
+      const [showClub, setShowClub] = useState(false);
+      const [showMarket, setShowMarket] = useState(false);
+      const [botInfo, setBotInfo] = useState('');
+      const [isPlaying, setIsPlaying] = useState(false);
+      const [timer, setTimer] = useState(30);
+      const [matchScore, setMatchScore] = useState({ player: 0, bot: 0 });
+      const [showTournament, setShowTournament] = useState(false);
+      const [showPenaltyShooter, setShowPenaltyShooter] = useState(false);
+
+      const packs = [
+        // ... existing code ...
+      ];
+
+      useEffect(() => {
+        // ... existing code ...
+      }, [isPlaying, timer]);
+
+      const openPack = (pack) => {
+        // ... existing code ...
+      };
+
+      const calculateWinChance = (teamOVR, botOVR) => {
+        // ... existing code ...
+      };
+
+      const simulateGoals = (winChance) => {
+        // ... existing code ...
+      };
+
+      const playAgainstBot = () => {
+        // ... existing code ...
+      };
+
+      const handleTournamentReward = (coins, credits) => {
+        // ... existing code ...
+      };
+
+      return (
+        <div className="min-h-screen bg-gray-900 text-white p-8">
+          <h1 className="text-4xl font-bold text-center mb-8">FIFA Pack Simulator</h1>
+          <div className="flex justify-center gap-8 mb-8">
+            {/* ... existing code ... */}
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            {/* ... existing code ... */}
+          </div>
+          {selectedPlayer && (
+            <PlayerCard
+              player={selectedPlayer}
+              onClose={() => setSelectedPlayer(null)}
+            />
+          )}
+          <div className="flex justify-center gap-4 mb-8">
+            {/* ... existing code ... */}
+            <button
+              onClick={() => setShowPenaltyShooter(true)}
+              className="flex items-center gap-2 bg-red-600 hover:bg-red-700 px-6 py-3 rounded-lg"
+            >
+              <Trophy size={20} />
+              Penalty Shooter
+            </button>
+          </div>
+          {botInfo && (
+            <div className="text-center space-y-2 mb-8">
+              {/* ... existing code ... */}
             </div>
-          ))}
+          )}
+          {showClub && (
+            <Club
+              players={clubPlayers}
+              onClose={() => setShowClub(false)}
+              credits={credits}
+              setCredits={setCredits}
+              setPlayers={setClubPlayers}
+            />
+          )}
+          {showMarket && (
+            <TransferMarket
+              availablePlayers={players.filter(p => !clubPlayers.some(cp => cp.name === p.name))}
+              coins={coins}
+              setCoins={setCoins}
+              onPlayerBuy={(player) => setClubPlayers(prev => [...prev, player])}
+              onClose={() => setShowMarket(false)}
+            />
+          )}
+          {showTournament && (
+            <Tournament
+              onClose={() => setShowTournament(false)}
+              onReward={handleTournamentReward}
+            />
+          )}
+          {showPenaltyShooter && (
+            <PenaltyShooter
+              onClose={() => setShowPenaltyShooter(false)}
+            />
+          )}
         </div>
-      </div>
-    </div>
-  );
-}
-
-function TransferMarket({ availablePlayers, coins, setCoins, onPlayerBuy, onClose }: {
-  availablePlayers: Player[];
-  coins: number;
-  setCoins: (coins: number) => void;
-  onPlayerBuy: (player: Player) => void;
-  onClose: () => void;
-}) {
-  const buyPlayer = (player: Player) => {
-    const price = calculatePlayerPrice(player.rating);
-    if (coins >= price) {
-      setCoins(coins - price);
-      onPlayerBuy(player);
-    } else {
-      alert('Not enough coins to buy this player!');
-    }
-  };
-
-  return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center overflow-auto">
-      <div className="bg-gray-800 p-8 rounded-lg relative max-w-4xl w-full m-4">
-        <button
-          onClick={onClose}
-          className="absolute top-4 right-4 text-gray-400 hover:text-white"
-        >
-          <X size={24} />
-        </button>
-        
-        <h2 className="text-2xl font-bold mb-6">Transfer Market</h2>
-        
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {availablePlayers.map((player, index) => (
-            <div key={index} className="bg-gray-700 p-4 rounded-lg">
-              <img
-                src={player.image}
-                alt={player.name}
-                className="w-full h-48 object-cover rounded-lg mb-4"
-              />
-              <div className="space-y-2">
-                <h3 className="font-semibold">{player.name}</h3>
-                <p>Rating: {player.rating}</p>
-                <p>Position: {player.position}</p>
-                <p className="text-yellow-400">Price: {calculatePlayerPrice(player.rating)} coins</p>
-                <button
-                  onClick={() => buyPlayer(player)}
-                  className="flex items-center gap-2 bg-green-600 hover:bg-green-700 px-4 py-2 rounded-lg w-full justify-center"
-                >
-                  <ShoppingCart size={16} />
-                  Buy Now
-                </button>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-    </div>
-  );
-}
-
-// Main App Component
-function App() {
-  const [coins, setCoins] = useState(200);
-  const [gems, setGems] = useState(25);
-  const [credits, setCredits] = useState(0);
-  const [clubPlayers, setClubPlayers] = useState<Player[]>([]);
-  const [selectedPlayer, setSelectedPlayer] = useState<Player | null>(null);
-  const [showClub, setShowClub] = useState(false);
-  const [showMarket, setShowMarket] = useState(false);
-  const [botInfo, setBotInfo] = useState('');
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [timer, setTimer] = useState(30);
-  const [matchScore, setMatchScore] = useState({ player: 0, bot: 0 });
-  const [showTournament, setShowTournament] = useState(false);
-
-  const packs: Pack[] = [
-    { type: 'low', cost: 10, credits: 5, label: 'Low Tier Pack' },
-    { type: 'medium', cost: 25, credits: 15, label: 'Medium Tier Pack' },
-    { type: 'high', cost: 50, credits: 30, label: 'High Tier Pack' }
-  ];
-
-  useEffect(() => {
-    let interval: number;
-    if (isPlaying && timer > 0) {
-      interval = setInterval(() => {
-        setTimer(prev => prev - 1);
-      }, 1000);
-    } else if (timer === 0) {
-      setIsPlaying(false);
-      setTimer(30);
-    }
-    return () => clearInterval(interval);
-  }, [isPlaying, timer]);
-
-  const openPack = (pack: Pack) => {
-    if (coins >= pack.cost) {
-      setCoins(prev => prev - pack.cost);
-      setCredits(prev => prev + pack.credits);
-      
-      const probabilities = getPackProbabilities(pack.type);
-      const rand = Math.random();
-      
-      let playerPool;
-      if (rand < probabilities[99]) {
-        playerPool = players.filter(p => p.rating === 99);
-      } else if (rand < probabilities[99] + probabilities[90]) {
-        playerPool = players.filter(p => p.rating >= 90 && p.rating < 99);
-      } else if (rand < probabilities[99] + probabilities[90] + probabilities[85]) {
-        playerPool = players.filter(p => p.rating >= 85 && p.rating < 90);
-      } else {
-        playerPool = players.filter(p => p.rating < 85);
-      }
-      
-      const randomPlayer = playerPool[Math.floor(Math.random() * playerPool.length)];
-      if (randomPlayer) {
-        setSelectedPlayer(randomPlayer);
-        setClubPlayers(prev => [...prev, randomPlayer]);
-      }
-    } else {
-      alert('Not enough coins!');
-    }
-  };
-
-  const calculateWinChance = (teamOVR: number, botOVR: number) => {
-    const difference = teamOVR - botOVR;
-    const baseChance = 50;
-    const modifier = difference * 5;
-    return Math.min(Math.max(baseChance + modifier, 10), 90);
-  };
-
-  const simulateGoals = (winChance: number) => {
-    const playerGoals = Math.floor(Math.random() * 5);
-    let botGoals;
-    
-    if (Math.random() * 100 < winChance) {
-      botGoals = Math.max(0, playerGoals - Math.floor(Math.random() * 3));
-    } else {
-      botGoals = playerGoals + 1 + Math.floor(Math.random() * 2);
+      );
     }
 
-    return { playerGoals, botGoals };
-  };
-
-  const playAgainstBot = () => {
-    if (clubPlayers.length < 11) {
-      alert('You need 11 players to play against the bot.');
-      return;
-    }
-
-    if (isPlaying) {
-      alert('Please wait for the current match to finish!');
-      return;
-    }
-
-    setIsPlaying(true);
-    setTimer(30);
-
-    const teamOVR = clubPlayers.reduce((sum, player) => sum + player.rating, 0) / clubPlayers.length;
-    const botOVR = 85 + Math.floor(Math.random() * 15);
-    const winChance = calculateWinChance(teamOVR, botOVR);
-    const { playerGoals, botGoals } = simulateGoals(winChance);
-
-    setMatchScore({ player: playerGoals, bot: botGoals });
-
-    if (playerGoals > botGoals) {
-      setCoins(prev => prev + 50);
-      setCredits(prev => prev + 20);
-      setBotInfo(`Victory! (${playerGoals}-${botGoals})\nYour team OVR: ${teamOVR.toFixed(1)}\nBot OVR: ${botOVR}\nWin Chance: ${winChance.toFixed(1)}%\nRewards: 50 coins, 20 credits`);
-    } else if (playerGoals < botGoals) {
-      setBotInfo(`Defeat! (${playerGoals}-${botGoals})\nYour team OVR: ${teamOVR.toFixed(1)}\nBot OVR: ${botOVR}\nWin Chance: ${winChance.toFixed(1)}%`);
-    } else {
-      setCoins(prev => prev + 25);
-      setCredits(prev => prev + 10);
-      setBotInfo(`Draw! (${playerGoals}-${botGoals})\nYour team OVR: ${teamOVR.toFixed(1)}\nBot OVR: ${botOVR}\nWin Chance: ${winChance.toFixed(1)}%\nRewards: 25 coins, 10 credits`);
-    }
-  };
-
-  const handleTournamentReward = (coins: number, credits: number) => {
-    setCoins(prev => prev + coins);
-    setCredits(prev => prev + credits);
-  };
-
-  return (
-    <div className="min-h-screen bg-gray-900 text-white p-8">
-      <h1 className="text-4xl font-bold text-center mb-8">FIFA Pack Simulator</h1>
-      
-      <div className="flex justify-center gap-8 mb-8">
-        <div className="flex items-center gap-2">
-          <Coins className="text-yellow-400" />
-          <span>{coins}</span>
-        </div>
-        <div className="flex items-center gap-2">
-          <Gem className="text-purple-400" />
-          <span>{gems}</span>
-        </div>
-        <div className="flex items-center gap-2">
-          <CreditCard className="text-green-400" />
-          <span>{credits}</span>
-        </div>
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-        {packs.map((pack) => (
-          <PackOpening
-            key={pack.type}
-            pack={pack}
-            onOpen={() => openPack(pack)}
-          />
-        ))}
-      </div>
-
-      {selectedPlayer && (
-        <PlayerCard
-          player={selectedPlayer}
-          onClose={() => setSelectedPlayer(null)}
-        />
-      )}
-
-      <div className="flex justify-center gap-4 mb-8">
-        <button
-          onClick={() => setShowClub(true)}
-          className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 px-6 py-3 rounded-lg"
-        >
-          <Users size={20} />
-          View Club
-        </button>
-        <button
-          onClick={() => setShowMarket(true)}
-          className="flex items-center gap-2 bg-green-600 hover:bg-green-700 px-6 py-3 rounded-lg"
-        >
-          <ShoppingCart size={20} />
-          Transfer Market
-        </button>
-        <button
-          onClick={playAgainstBot}
-          disabled={isPlaying || clubPlayers.length < 11}
-          className="bg-purple-600 hover:bg-purple-700 disabled:bg-gray-600 px-6 py-3 rounded-lg flex items-center gap-2"
-        >
-          Play Against Bot {isPlaying && `(${timer}s)`}
-        </button>
-        <button
-          onClick={() => setShowTournament(true)}
-          className="flex items-center gap-2 bg-yellow-600 hover:bg-yellow-700 px-6 py-3 rounded-lg"
-        >
-          <Trophy size={20} />
-          Tournament Mode
-        </button>
-      </div>
-
-      {botInfo && (
-        <div className="text-center space-y-2 mb-8">
-          <div className="text-3xl font-bold mb-4">
-            {matchScore.player} - {matchScore.bot}
-          </div>
-          <div className="text-xl whitespace-pre-line p-4 bg-gray-800 rounded-lg">
-            {botInfo}
-          </div>
-        </div>
-      )}
-
-      {showClub && (
-        <Club
-          players={clubPlayers}
-          onClose={() => setShowClub(false)}
-          credits={credits}
-          setCredits={setCredits}
-          setPlayers={setClubPlayers}
-        />
-      )}
-
-      {showMarket && (
-        <TransferMarket
-          availablePlayers={players.filter(p => !clubPlayers.some(cp => cp.name === p.name))}
-          coins={coins}
-          setCoins={setCoins}
-          onPlayerBuy={(player) => setClubPlayers(prev => [...prev, player])}
-          onClose={() => setShowMarket(false)}
-        />
-      )}
-
-      {showTournament && (
-        <Tournament
-          onClose={() => setShowTournament(false)}
-          onReward={handleTournamentReward}
-        />
-      )}
-    </div>
-  );
-}
-
-export default App;
-        </Tournament>
-        </TransferMarket>
-        </Club>
-        </PlayerCard>
-    </div>
-    </botGoals>
-    </body>
-      
-    </html>
+    ReactDOM.render(<App />, document.getElementById('root'));
+  </script>
+</body>
+</html>
