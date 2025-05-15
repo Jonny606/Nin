@@ -1,285 +1,73 @@
-<!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>FIFA Pack Simulator</title>
-  <script src="https://unpkg.com/react/umd/react.development.js"></script>
-  <script src="https://unpkg.com/react-dom/umd/react-dom.development.js"></script>
-  <script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-  <link rel="stylesheet" href="styles.css">
-  <style>
-    body { margin: 0; }
-    canvas { display: block; }
-  </style>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-K8CCSDNPV3"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-K8CCSDNPV3');
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>New Tab</title>
+    <link rel="stylesheet" href="../storage/css/evenmorestyles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="../storage/css/static.css">
 </head>
 <body>
-  <div id="root"></div>
-  <script type="text/babel">
-    import React, { useState, useEffect } from 'react';
-    import { Package, Coins, Gem, CreditCard, Users, ShoppingCart, X, ArrowUp, Trophy } from 'lucide-react';
-    import { players } from './data/players';
-    import { Player, Pack } from './types';
-    import { Tournament } from './components/Tournament';
 
-    // Helper Functions
-    function getPackProbabilities(packType) {
-      // ... existing code ...
-    }
+<script src="../particles.js"></script>
+  <script src="../app.js"></script>
+<div id="particles-js"></div>
 
-    function calculatePlayerPrice(rating) {
-      // ... existing code ...
-    }
+    <h1>US4</h1>
+    <p id="dynamicParagraph">(TEXT)</p>
 
-    function PlayerCard({ player, onClose }) {
-      // ... existing code ...
-    }
+    <div id="search-container">
+        <form id="uv-form">
+            <input id="uv-search-engine" value="https://duckduckgo.com/?q=%s" type="hidden"/>
+            <input id="uv-address" type="text" class="search-bar-home" placeholder="Search or enter a URL" />
+            <button id="search-button" onclick="submitSearch()">SEARCH <i class="fa-solid fa-magnifying-glass"></i></button>
+        </form>
 
-    function PackOpening({ pack, onOpen }) {
-      // ... existing code ...
-    }
-
-    function Club({ players, onClose, credits, setCredits, setPlayers }) {
-      // ... existing code ...
-    }
-
-    function TransferMarket({ availablePlayers, coins, setCoins, onPlayerBuy, onClose }) {
-      // ... existing code ...
-    }
-
-    function PenaltyShooter({ onClose }) {
-      useEffect(() => {
-        // Set up the scene, camera, and renderer
-        const scene = new THREE.Scene();
-        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-        const renderer = new THREE.WebGLRenderer();
-        renderer.setSize(window.innerWidth, window.innerHeight);
-        document.body.appendChild(renderer.domElement);
-
-        // Add a field
-        const fieldGeometry = new THREE.PlaneGeometry(20, 30);
-        const fieldMaterial = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
-        const field = new THREE.Mesh(fieldGeometry, fieldMaterial);
-        field.rotation.x = -Math.PI / 2;
-        scene.add(field);
-
-        // Add a goalpost
-        const goalGeometry = new THREE.BoxGeometry(8, 4, 0.1);
-        const goalMaterial = new THREE.MeshBasicMaterial({ color: 0xffffff });
-        const goal = new THREE.Mesh(goalGeometry, goalMaterial);
-        goal.position.set(0, 2, -15);
-        scene.add(goal);
-
-        // Add a ball
-        const ballGeometry = new THREE.SphereGeometry(0.5, 32, 32);
-        const ballMaterial = new THREE.MeshBasicMaterial({ color: 0xff0000 });
-        const ball = new THREE.Mesh(ballGeometry, ballMaterial);
-        ball.position.set(0, 0.5, 0);
-        scene.add(ball);
-
-        // Add a player
-        const playerGeometry = new THREE.BoxGeometry(1, 2, 0.5);
-        const playerMaterial = new THREE.MeshBasicMaterial({ color: 0x0000ff });
-        const player = new THREE.Mesh(playerGeometry, playerMaterial);
-        player.position.set(0, 1, 2);
-        scene.add(player);
-
-        // Add a goalie
-        const goalieGeometry = new THREE.BoxGeometry(1, 2, 0.5);
-        const goalieMaterial = new THREE.MeshBasicMaterial({ color: 0x000000 });
-        const goalie = new THREE.Mesh(goalieGeometry, goalieMaterial);
-        goalie.position.set(0, 1, -14.5);
-        scene.add(goalie);
-
-        camera.position.z = 10;
-
-        // Goalie movement logic
-        let goalieDirection = 1;
-        const goalieSpeed = 0.05;
-        const animateGoalie = () => {
-          if (goalie.position.x > 4 || goalie.position.x < -4) {
-            goalieDirection *= -1;
-          }
-          goalie.position.x += goalieDirection * goalieSpeed;
-        };
-
-        // Swipe detection logic
-        let startX, startY, endX, endY;
-        const minSwipeDistance = 30;
-
-        const onTouchStart = (e) => {
-          startX = e.touches[0].clientX;
-          startY = e.touches[0].clientY;
-        };
-
-        const onTouchEnd = (e) => {
-          endX = e.changedTouches[0].clientX;
-          endY = e.changedTouches[0].clientY;
-
-          const dx = endX - startX;
-          const dy = endY - startY;
-
-          if (Math.abs(dx) >= minSwipeDistance || Math.abs(dy) >= minSwipeDistance) {
-            shootBall(dx, dy);
-          }
-        };
-
-        const shootBall = (dx, dy) => {
-          const angle = Math.atan2(dy, dx);
-          const speed = 0.2;
-          ball.position.x += speed * Math.cos(angle);
-          ball.position.y += speed * Math.sin(angle);
-          checkGoal();
-        };
-
-        const checkGoal = () => {
-          if (ball.position.z < goal.position.z && Math.abs(ball.position.x - goalie.position.x) > 1) {
-            alert('Goal!');
-          } else {
-            alert('Missed! You cannot play the tournament until tomorrow.');
-            // Logic to prevent playing the tournament until the next day
-          }
-        };
-
-        document.addEventListener('touchstart', onTouchStart);
-        document.addEventListener('touchend', onTouchEnd);
-
-        // Render loop
-        const animate = function () {
-          requestAnimationFrame(animate);
-          animateGoalie();
-          renderer.render(scene, camera);
-        };
-
-        animate();
-
-        return () => {
-          document.body.removeChild(renderer.domElement);
-          document.removeEventListener('touchstart', onTouchStart);
-          document.removeEventListener('touchend', onTouchEnd);
-        };
-      }, []);
-
-      return (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-          <button
-            onClick={onClose}
-            className="absolute top-4 right-4 text-gray-400 hover:text-white"
-          >
-            <X size={24} />
-          </button>
+        <div class="desc left-margin">
+            <p id="uv-error"></p>
+            <pre id="uv-error-code"></pre>
         </div>
-      );
+    </div>
+
+    <script src="uv/uv.bundle.js" defer></script>
+    <script src="uv/uv.config.js" defer></script>
+    <script src="register-sw.js" defer></script>
+    <script src="search.js" defer></script>
+    <script src="index.js" defer></script>
+
+    <script type="text/javascript" src="../storage/js/background.js"></script>
+    <script src="../storage/js/splash-messages.js"></script>
+
+    <script>
+    async function regsw(){
+        await navigator.serviceWorker.register("/static/uv-sw.js", {
+            scope: "/static/",
+        });
     }
 
-    function App() {
-      const [coins, setCoins] = useState(200);
-      const [gems, setGems] = useState(25);
-      const [credits, setCredits] = useState(0);
-      const [clubPlayers, setClubPlayers] = useState([]);
-      const [selectedPlayer, setSelectedPlayer] = useState(null);
-      const [showClub, setShowClub] = useState(false);
-      const [showMarket, setShowMarket] = useState(false);
-      const [botInfo, setBotInfo] = useState('');
-      const [isPlaying, setIsPlaying] = useState(false);
-      const [timer, setTimer] = useState(30);
-      const [matchScore, setMatchScore] = useState({ player: 0, bot: 0 });
-      const [showTournament, setShowTournament] = useState(false);
-      const [showPenaltyShooter, setShowPenaltyShooter] = useState(false);
-
-      const packs = [
-        // ... existing code ...
-      ];
-
-      useEffect(() => {
-        // ... existing code ...
-      }, [isPlaying, timer]);
-
-      const openPack = (pack) => {
-        // ... existing code ...
-      };
-
-      const calculateWinChance = (teamOVR, botOVR) => {
-        // ... existing code ...
-      };
-
-      const simulateGoals = (winChance) => {
-        // ... existing code ...
-      };
-
-      const playAgainstBot = () => {
-        // ... existing code ...
-      };
-
-      const handleTournamentReward = (coins, credits) => {
-        // ... existing code ...
-      };
-
-      return (
-        <div className="min-h-screen bg-gray-900 text-white p-8">
-          <h1 className="text-4xl font-bold text-center mb-8">FIFA Pack Simulator</h1>
-          <div className="flex justify-center gap-8 mb-8">
-            {/* ... existing code ... */}
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-            {/* ... existing code ... */}
-          </div>
-          {selectedPlayer && (
-            <PlayerCard
-              player={selectedPlayer}
-              onClose={() => setSelectedPlayer(null)}
-            />
-          )}
-          <div className="flex justify-center gap-4 mb-8">
-            {/* ... existing code ... */}
-            <button
-              onClick={() => setShowPenaltyShooter(true)}
-              className="flex items-center gap-2 bg-red-600 hover:bg-red-700 px-6 py-3 rounded-lg"
-            >
-              <Trophy size={20} />
-              Penalty Shooter
-            </button>
-          </div>
-          {botInfo && (
-            <div className="text-center space-y-2 mb-8">
-              {/* ... existing code ... */}
-            </div>
-          )}
-          {showClub && (
-            <Club
-              players={clubPlayers}
-              onClose={() => setShowClub(false)}
-              credits={credits}
-              setCredits={setCredits}
-              setPlayers={setClubPlayers}
-            />
-          )}
-          {showMarket && (
-            <TransferMarket
-              availablePlayers={players.filter(p => !clubPlayers.some(cp => cp.name === p.name))}
-              coins={coins}
-              setCoins={setCoins}
-              onPlayerBuy={(player) => setClubPlayers(prev => [...prev, player])}
-              onClose={() => setShowMarket(false)}
-            />
-          )}
-          {showTournament && (
-            <Tournament
-              onClose={() => setShowTournament(false)}
-              onReward={handleTournamentReward}
-            />
-          )}
-          {showPenaltyShooter && (
-            <PenaltyShooter
-              onClose={() => setShowPenaltyShooter(false)}
-            />
-          )}
-        </div>
-      );
-    }
-
-    ReactDOM.render(<App />, document.getElementById('root'));
-  </script>
+    regsw();
+    </script>
+    <script>
+      const code = ['ArrowUp', 'ArrowUp', 'ArrowDown', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'ArrowLeft', 'ArrowRight', 'b', 'a', 'Enter'];
+      let currentKeyIndex = 0;
+      document.addEventListener('keydown', (event) => {
+        if (event.key === code[currentKeyIndex]) {
+          currentKeyIndex++;
+          if (currentKeyIndex === code.length) {
+            window.location.href = "/pages/super-secret?upd"
+            currentKeyIndex = 0;
+          }
+        } else {
+          currentKeyIndex = 0;
+        }
+      });
+    </script>
 </body>
 </html>
